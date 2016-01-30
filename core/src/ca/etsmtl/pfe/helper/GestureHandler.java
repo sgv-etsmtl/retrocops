@@ -3,7 +3,6 @@ package ca.etsmtl.pfe.helper;
 
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 
 import ca.etsmtl.pfe.gameworld.GameWorld;
 
@@ -20,7 +19,8 @@ public class GestureHandler implements GestureDetector.GestureListener {
 
     @Override
     public boolean touchDown(float x, float y, int pointer, int button) {
-        return false;
+        gameWorld.getWorldPositioonFromScreenPosition(x,y);
+        return true;
     }
 
     @Override

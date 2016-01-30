@@ -2,7 +2,6 @@ package ca.etsmtl.pfe.retrocops;
 
 import com.badlogic.gdx.Game;
 
-import ca.etsmtl.pfe.screens.GameScreen;
 import ca.etsmtl.pfe.screens.MainMenu;
 
 public class RetroCops extends Game {

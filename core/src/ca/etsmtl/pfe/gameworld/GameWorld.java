@@ -1,5 +1,7 @@
 package ca.etsmtl.pfe.gameworld;
 
+import com.badlogic.gdx.math.Vector3;
+
 //This class is use to store all game object in the world and update them
 //after a frame.
 public class GameWorld {
@@ -10,7 +12,7 @@ public class GameWorld {
         this.gameRenderer = gameRenderer;
 
         //this for debug
-        GameMap gameMap = new GameMap("beta.tmx");
+        GameMap gameMap = new GameMap("beta2.tmx");
         gameRenderer.setCurrentMap(gameMap);
     }
 
@@ -20,6 +22,10 @@ public class GameWorld {
 
     public void translateCamera(float x, float y){
         gameRenderer.tranlateCamera(x,y);
+    }
+
+    public Vector3 getWorldPositioonFromScreenPosition(float x, float y){
+        return gameRenderer.transformScreenLocationToWorldLocation(x,y);
     }
 
 }

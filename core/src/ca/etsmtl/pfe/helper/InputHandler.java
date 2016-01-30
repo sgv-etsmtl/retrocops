@@ -1,7 +1,6 @@
 package ca.etsmtl.pfe.helper;
 
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 
 import ca.etsmtl.pfe.gameworld.GameWorld;
