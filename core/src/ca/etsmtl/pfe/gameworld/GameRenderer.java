@@ -10,9 +10,11 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 
+import ca.etsmtl.pfe.ui.Menu;
+
 public class GameRenderer {
 
-
+    private Menu menu;
     private OrthographicCamera cam;
     private GameMap currentMap;
     //private static float HEIGTH_VIEW = 580;
@@ -57,11 +59,25 @@ public class GameRenderer {
         this.currentMap = currentMap;
     }
 
+    public Menu getMenu() {
+        return menu;
+    }
+
+    public void setMenu(Menu menu) {
+        this.menu = menu;
+    }
+
+    public boolean isPositionPixelIsInMenu(float x, float y){
+        transformScreenLocationToWorldLocation(x,y);
+        return worldPosition.x < cam.position.x - viewportWidth/2 + 320;
+    }
+
     public void render(float delta){
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         cam.update();
+
         shapeRenderer.setProjectionMatrix(cam.combined);
         currentMap.render(cam);
 
@@ -95,6 +111,8 @@ public class GameRenderer {
         writeFont.draw(batcher, "pos cam " + cam.position.x + ", " + cam.position.y, 60, 800);
         writeFont.draw(batcher, "world click " + worldPosition.x + ", " + worldPosition.y, 60, 600);
         batcher.end();
+
+        menu.drawMenu();
     }
 
     public void tranlateCamera(float x, float y) {

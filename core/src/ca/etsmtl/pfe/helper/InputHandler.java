@@ -1,6 +1,7 @@
 package ca.etsmtl.pfe.helper;
 
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 
 import ca.etsmtl.pfe.gameworld.GameWorld;
@@ -34,11 +35,14 @@ public class InputHandler implements InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        gameWorld.getWorldPositioonFromScreenPosition(screenX,screenY);
+        Gdx.app.log("info", "touch down");
         return false;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        Gdx.app.log("info", "touch up");
         return false;
     }
 

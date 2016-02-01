@@ -1,6 +1,7 @@
 package ca.etsmtl.pfe.helper;
 
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 
@@ -12,15 +13,18 @@ import ca.etsmtl.pfe.gameworld.GameWorld;
 
 public class GestureHandler implements GestureDetector.GestureListener {
     private GameWorld gameWorld;
+    private Vector2 dragFirstPos;
 
     public GestureHandler(GameWorld gameWorld){
         this.gameWorld = gameWorld;
+        dragFirstPos = new Vector2();
     }
 
     @Override
     public boolean touchDown(float x, float y, int pointer, int button) {
-        gameWorld.getWorldPositioonFromScreenPosition(x,y);
-        return true;
+        dragFirstPos.x = x;
+        dragFirstPos.y = y;
+        return false;
     }
 
     @Override
@@ -40,8 +44,11 @@ public class GestureHandler implements GestureDetector.GestureListener {
 
     @Override
     public boolean pan(float x, float y, float deltaX, float deltaY) {
-        gameWorld.translateCamera(-deltaX,deltaY);
-        return true;
+        if(!gameWorld.isPositionPixelInMenu(dragFirstPos.x,dragFirstPos.y)) {
+            gameWorld.translateCamera(-deltaX, deltaY);
+            return true;
+        }
+        return false;
     }
 
     @Override

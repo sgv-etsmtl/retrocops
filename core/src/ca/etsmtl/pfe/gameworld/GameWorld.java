@@ -28,4 +28,8 @@ public class GameWorld {
         return gameRenderer.transformScreenLocationToWorldLocation(x,y);
     }
 
+    public boolean isPositionPixelInMenu(float x, float y){
+        return gameRenderer.isPositionPixelIsInMenu(x,y);
+    }
+
 }
