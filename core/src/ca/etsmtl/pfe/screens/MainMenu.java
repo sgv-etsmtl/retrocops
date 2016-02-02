@@ -16,14 +16,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 
+import ca.etsmtl.pfe.helper.AssetLoader;
+
 
 //https://www.youtube.com/watch?v=q2qoiTqGsh8
 public class MainMenu implements Screen{
 
     private Stage stage;
-    private TextureAtlas textureAtlas;
-    private BitmapFont gameFont;
-    private Skin skin;
     private Table table;
     private TextButton startButton;
     private Label gameName;
@@ -45,22 +44,18 @@ public class MainMenu implements Screen{
     public void show() {
 
         stage = new Stage(new FillViewport(width,heigth));
-        textureAtlas = new TextureAtlas(Gdx.files.internal("ui/button.pack"));
-        skin = new Skin(textureAtlas);
-        table = new Table(skin);
-        gameFont = new BitmapFont(Gdx.files.internal("font/font.fnt"));
-        gameFont.getData().setScale(2);
+        table = new Table();
 
         table.setBounds(0,0,stage.getWidth(),stage.getHeight());
 
 
         TextButton.TextButtonStyle startButtonStyle = new TextButton.TextButtonStyle();
         //name in the file button.pack
-        startButtonStyle.up = skin.getDrawable("button.up");
-        startButtonStyle.down = skin.getDrawable("button.down");
+        startButtonStyle.up = AssetLoader.skinButton.getDrawable("button.up");
+        startButtonStyle.down = AssetLoader.skinButton.getDrawable("button.down");
         startButtonStyle.pressedOffsetX = 10;
         startButtonStyle.pressedOffsetY = -5;
-        startButtonStyle.font = gameFont;
+        startButtonStyle.font = AssetLoader.gameFont;
 
         startButton = new TextButton("Start", startButtonStyle);
         startButton.pad(10);
@@ -71,7 +66,7 @@ public class MainMenu implements Screen{
         });
 
         Label.LabelStyle gameNameStyle = new Label.LabelStyle();
-        gameNameStyle.font = gameFont;
+        gameNameStyle.font = AssetLoader.gameFont;
 
         gameName = new Label("RetroCops",gameNameStyle);
 
@@ -119,8 +114,5 @@ public class MainMenu implements Screen{
     @Override
     public void dispose() {
         stage.dispose();
-        gameFont.dispose();
-        textureAtlas.dispose();
-        skin.dispose();
     }
 }

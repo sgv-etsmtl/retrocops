@@ -12,7 +12,7 @@ public class GameWorld {
         this.gameRenderer = gameRenderer;
 
         //this for debug
-        GameMap gameMap = new GameMap("beta2.tmx");
+        GameMap gameMap = new GameMap("beta.tmx");
         gameRenderer.setCurrentMap(gameMap);
     }
 
@@ -29,7 +29,15 @@ public class GameWorld {
     }
 
     public boolean isPositionPixelInMenu(float x, float y){
-        return gameRenderer.isPositionPixelIsInMenu(x,y);
+        return gameRenderer.getMenu().isMenuClicked(x,y);
+    }
+
+    public void setCameraZoom(float newZoom){
+        gameRenderer.setCameraZoom(newZoom);
+    }
+
+    public float getCameraZoom(){
+        return gameRenderer.getCameraZoom();
     }
 
 }

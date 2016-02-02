@@ -9,7 +9,6 @@ import com.badlogic.gdx.input.GestureDetector;
 import ca.etsmtl.pfe.gameworld.GameRenderer;
 import ca.etsmtl.pfe.gameworld.GameWorld;
 import ca.etsmtl.pfe.helper.GestureHandler;
-import ca.etsmtl.pfe.helper.InputHandler;
 import ca.etsmtl.pfe.ui.Menu;
 
 public class GameScreen implements Screen {
@@ -27,7 +26,6 @@ public class GameScreen implements Screen {
         InputMultiplexer inputMultiplexer = new InputMultiplexer();
         GestureDetector gestureDetector = new GestureDetector(new GestureHandler(gameWorld));
         inputMultiplexer.addProcessor(gestureDetector);
-        inputMultiplexer.addProcessor(new InputHandler(gameWorld));
         inputMultiplexer.addProcessor(gameMenu.getMenuStage());
 
         Gdx.input.setInputProcessor(inputMultiplexer);
@@ -66,6 +64,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void dispose() {
-
+        gameRenderer.dispose();
+        gameMenu.dispose();
     }
 }
