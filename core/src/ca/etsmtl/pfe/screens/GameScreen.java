@@ -20,7 +20,7 @@ public class GameScreen implements Screen {
     public GameScreen(float width, float heigth){
         gameMenu = new Menu(width,heigth);
         gameRenderer = new GameRenderer(width,heigth);
-        gameWorld = new GameWorld(gameRenderer);
+        gameWorld = new GameWorld(gameRenderer,gameMenu);
         gameRenderer.setMenu(gameMenu);
 
         InputMultiplexer inputMultiplexer = new InputMultiplexer();

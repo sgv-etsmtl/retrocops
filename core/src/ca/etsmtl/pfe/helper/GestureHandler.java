@@ -19,8 +19,8 @@ public class GestureHandler implements GestureDetector.GestureListener {
     private float originalZoom;
     private boolean newZoom;
 
-    private static final float MAX_ZOOM_IN = 3;
-    private static final float MAX_ZOOM_OUT = 0.3f;
+    private static final float MAX_ZOOM_OUT = 3;
+    private static final float MAX_ZOOM_IN = 0.3f;
 
     public GestureHandler(GameWorld gameWorld){
         this.gameWorld = gameWorld;
@@ -31,7 +31,7 @@ public class GestureHandler implements GestureDetector.GestureListener {
     public boolean touchDown(float x, float y, int pointer, int button) {
         dragFirstPos.x = x;
         dragFirstPos.y = y;
-        gameWorld.getWorldPositioonFromScreenPosition(x,y);
+        gameWorld.changeCharacterPosition(x,y);
         return false;
     }
 
@@ -76,27 +76,22 @@ public class GestureHandler implements GestureDetector.GestureListener {
         }
         else{
             newZoom = false;
+    }
+        float ratio = baseDistance/distance;
+        float newZoom = originalZoom*ratio;
+
+        if (newZoom >= MAX_ZOOM_OUT) {
+            gameWorld.setCameraZoom(MAX_ZOOM_OUT);
+            originalZoom = MAX_ZOOM_OUT;
+            baseDistance = distance;
+        } else if (newZoom <= MAX_ZOOM_IN) {
+            gameWorld.setCameraZoom(MAX_ZOOM_IN);
+            originalZoom = MAX_ZOOM_IN;
+            baseDistance = distance;
+        } else {
+            gameWorld.setCameraZoom(newZoom);
         }
-        //if(!gameWorld.isPositionPixelInMenu(dragFirstPos.x,dragFirstPos.y)) {
-            float ratio = baseDistance/distance;
-            float newZoom = originalZoom*ratio;
-
-            if (newZoom >= MAX_ZOOM_IN) {
-                gameWorld.setCameraZoom(MAX_ZOOM_IN);
-                originalZoom = MAX_ZOOM_IN;
-                baseDistance = distance;
-            } else if (newZoom <= MAX_ZOOM_OUT) {
-                gameWorld.setCameraZoom(MAX_ZOOM_OUT);
-                originalZoom = MAX_ZOOM_OUT;
-                baseDistance = distance;
-            } else {
-                gameWorld.setCameraZoom(newZoom);
-            }
-
-
-                return true;
-        //}
-        //return false;
+        return true;
     }
 
     @Override

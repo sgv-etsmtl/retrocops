@@ -72,12 +72,6 @@ public class Menu {
         shapeRenderer.setColor(Color.RED);
         shapeRenderer.rect((cam.position.x - viewportWidth / 2), (cam.position.y - viewportHeight / 2), 320, viewportHeight);
 
-        shapeRenderer.setColor(0, 1.0f, 0, 1);
-        shapeRenderer.rect(cam.position.x, cam.position.y, 100, 100);
-
-        shapeRenderer.setColor(0, 1.0f, 0, 1);
-        shapeRenderer.rect((cam.position.x - viewportWidth / 2), (cam.position.y - viewportHeight / 2), 20, 20);
-
         shapeRenderer.end();
 
         menuStage.act(Gdx.graphics.getDeltaTime());
