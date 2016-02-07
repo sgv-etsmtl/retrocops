@@ -24,7 +24,7 @@ public class GameRenderer {
     private float cameraViewHeight;
     private BitmapFont writeFont;
     private SpriteBatch batcher;
-    private SpriteBatch characterDrawing;
+    private SpriteBatch characterBatcher;
     private Vector3 worldPosition;
 
     private float leftboundary;
@@ -54,7 +54,7 @@ public class GameRenderer {
         calculateBoundary();
         writeFont = AssetLoader.whiteFont;
         characterToDraw = new Array<BaseCharacter>();
-        characterDrawing = new SpriteBatch();
+        characterBatcher = new SpriteBatch();
     }
 
     public void setCurrentMap(GameMap currentMap) {
@@ -68,11 +68,6 @@ public class GameRenderer {
 
     public void setMenu(Menu menu) {
         this.menu = menu;
-    }
-
-    public boolean isPositionPixelIsInMenu(float x, float y){
-        transformScreenLocationToWorldLocation(x, y);
-        return worldPosition.x < cam.position.x - cameraViewWidth/2 + 320;
     }
 
     public void addCharacterToDraw(BaseCharacter baseCharacter){
@@ -138,12 +133,12 @@ public class GameRenderer {
     }
 
     private void drawCharacter(boolean drawDebug){
-        characterDrawing.setProjectionMatrix(cam.combined);
-        characterDrawing.begin();
+        characterBatcher.setProjectionMatrix(cam.combined);
+        characterBatcher.begin();
         for(BaseCharacter character : characterToDraw){
-            character.draw(characterDrawing);
+            character.draw(characterBatcher);
         }
-        characterDrawing.end();
+        characterBatcher.end();
         if(drawDebug){
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
             for(BaseCharacter character : characterToDraw){
@@ -223,10 +218,10 @@ public class GameRenderer {
     }
 
     public void dispose(){
-        characterDrawing.dispose();
+        characterBatcher.dispose();
         writeFont.dispose();
         batcher.dispose();
-        characterDrawing.dispose();
+        characterBatcher.dispose();
         shapeRenderer.dispose();
 
     }

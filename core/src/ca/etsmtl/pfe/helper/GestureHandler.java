@@ -1,7 +1,6 @@
 package ca.etsmtl.pfe.helper;
 
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 
@@ -17,7 +16,6 @@ public class GestureHandler implements GestureDetector.GestureListener {
     private float originalDistanceZoom;
     private float baseDistance;
     private float originalZoom;
-    private boolean newZoom;
 
     private static final float MAX_ZOOM_OUT = 3;
     private static final float MAX_ZOOM_IN = 0.3f;
@@ -31,13 +29,16 @@ public class GestureHandler implements GestureDetector.GestureListener {
     public boolean touchDown(float x, float y, int pointer, int button) {
         dragFirstPos.x = x;
         dragFirstPos.y = y;
-        gameWorld.changeCharacterPosition(x,y);
+        //for debug message click in the menu
+        gameWorld.getWorldPositioonFromScreenPosition(x, y);
         return false;
     }
 
     @Override
     public boolean tap(float x, float y, int count, int button) {
-        return false;
+        gameWorld.getWorldPositioonFromScreenPosition(x,y);
+        gameWorld.changeCharacterPosition(x,y);
+        return true;
     }
 
     @Override
@@ -69,14 +70,10 @@ public class GestureHandler implements GestureDetector.GestureListener {
     public boolean zoom(float initialDistance, float distance) {
 
         if(originalDistanceZoom != initialDistance){
-            newZoom = true;
             originalDistanceZoom = initialDistance;
             baseDistance = initialDistance;
             originalZoom = gameWorld.getCameraZoom();
         }
-        else{
-            newZoom = false;
-    }
         float ratio = baseDistance/distance;
         float newZoom = originalZoom*ratio;
 
