@@ -1,7 +1,6 @@
 package ca.etsmtl.pfe.gameworld;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
@@ -9,8 +8,6 @@ import ca.etsmtl.pfe.gameobjects.BaseCharacter;
 import ca.etsmtl.pfe.helper.AssetLoader;
 import ca.etsmtl.pfe.ui.Menu;
 
-//This class is use to store all game object in the world and update them
-//after a frame.
 public class GameWorld {
 
     private GameMap gameMap;

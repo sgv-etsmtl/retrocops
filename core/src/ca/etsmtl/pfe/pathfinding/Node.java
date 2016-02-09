@@ -4,9 +4,17 @@ package ca.etsmtl.pfe.pathfinding;
 import com.badlogic.gdx.ai.pfa.Connection;
 import com.badlogic.gdx.ai.pfa.DefaultConnection;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedNode;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
+
+/*
+   CODE EMPRUNTÉ :
+   Les lignes suivantes la classe
+   provenant du site :
+      https://github.com/LetsMakeAnIndieGame/PhysicsShmup/blob/master/core/src/com/mygdx/game/pathfinding/Node.java
+   J'ai la classe sert à une tuile dans le graph et ces connection avec les autres tuiles et je l'ai adapté a mon problème
+   en lui ajoutant des attribut sur les infos de la tuile.
+*/
 public class Node implements IndexedNode<Node> {
     private Array<Connection<Node>> connections = new Array<Connection<Node>>();
     private int index;
@@ -88,3 +96,4 @@ public class Node implements IndexedNode<Node> {
     }
 
 }
+/* FIN DU CODE EMPRUNTÉ */

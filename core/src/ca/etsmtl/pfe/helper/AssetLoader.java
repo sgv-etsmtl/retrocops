@@ -5,8 +5,16 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
+
+/*
+   CODE EMPRUNTÉ :
+   Les lignes suivantes sont basées sur une classe
+   provenant du site :
+      http://www.kilobolt.com/day-6-adding-graphics---welcome-to-the-necropolis.html
+   J'ai la classe sert à charger en mémoire toutes les ressources(son, texture, ect.) utilisées durant toute la session de jeu.
+   Je mis les ressources que nous avons besoins de charger en mémoire
+*/
 public class AssetLoader {
 
     public static TextureAtlas textureAtlasButton;
@@ -32,3 +40,5 @@ public class AssetLoader {
         testSprite.dispose();
     }
 }
+/* FIN DU CODE EMPRUNTÉ */
+

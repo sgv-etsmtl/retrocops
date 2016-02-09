@@ -11,15 +11,26 @@ import ca.etsmtl.pfe.pathfinding.Node;
 
 public class BaseCharacter {
 
+    /*
+    CODE EMPRUNTÉ :
+       Les lignes suivantes sont basées sur la classe
+       provenant du site :
+      https://bitbucket.org/dermetfan/somelibgdxtests/src/8f2d5d953c42c9c1f52ce588a4abfa450995480e/src/net/dermetfan/someLibgdxTests/entities/AISprite.java?at=default&fileviewer=file-view-default
+      J'ai pris les variable suivant de la clasee du site web pour les utilisées dans la méthode update
+      et isWaypointReached qui sont aussi pris tiré du même site web
+    */
+
     private Vector2 position;
     private Vector2 velocity;
     private float speed;
+    private int waypoint = 0;
+    /* FIN DU CODE EMPRUNTÉ */
 
     private boolean isAlive;
     Sprite spriteCharacter;
 
     private DefaultGraphPath<Node> pathToWalk;
-    private int waypoint = 0;
+
     private Node nextPosition;
 
     public BaseCharacter(){
@@ -102,7 +113,15 @@ public class BaseCharacter {
         }
     }
 
-    //https://bitbucket.org/dermetfan/somelibgdxtests/src/8f2d5d953c42c9c1f52ce588a4abfa450995480e/src/net/dermetfan/someLibgdxTests/entities/AISprite.java?at=default&fileviewer=file-view-default
+    /*
+    CODE EMPRUNTÉ :
+       Les lignes suivantes sont basées sur la classe
+       provenant du site :
+      https://bitbucket.org/dermetfan/somelibgdxtests/src/8f2d5d953c42c9c1f52ce588a4abfa450995480e/src/net/dermetfan/someLibgdxTests/entities/AISprite.java?at=default&fileviewer=file-view-default
+      J'ai pris la méthode update qui calcule la prochaine position du personnage entre sa position actuel et la position qu'il doit atteindre
+      dépendement du nombre de seconde qui se sont écoulé depuis le dernier frame.
+      Je l'ai modifier pour utiliser une liste de noeud (fait par le path finding) au lieu du liste de vecteur
+    */
     public void update(float delta){
         if(pathToWalk != null) {
             nextPosition = pathToWalk.get(waypoint);
@@ -113,7 +132,6 @@ public class BaseCharacter {
                 velocity.set((float) Math.cos(angle) * speed, (float) Math.sin(angle) * speed);
 
                 setPosition(position.x + velocity.x * delta, position.y + velocity.y * delta);
-                //spriteCharacter.setRotation(angle * MathUtils.radiansToDegrees);
 
                 if (isWaypointReached(delta)) {
                     setPosition(nextPosition.getTilePixelX(), nextPosition.getTilePixelY());
@@ -124,11 +142,30 @@ public class BaseCharacter {
             }
         }
     }
-    //https://www.youtube.com/watch?v=c-X7yvM1kOs
+    /* FIN DU CODE EMPRUNTÉ */
+
+    /*
+    CODE EMPRUNTÉ :
+       Les lignes suivantes sont basées sur la classe
+       provenant du site :
+      https://bitbucket.org/dermetfan/somelibgdxtests/src/db75d09d7c23a714da4d5847b3bcb2493de160fc/src/net/dermetfan/someLibgdxTests/entities/AISprite.java?at=default&fileviewer=file-view-default
+      J'ai pris la méthode isWaypointReached qui décide si la position actuel du personnage devrait être la position à atteindre
+    */
     private boolean isWaypointReached(float delta) {
         return Math.abs(nextPosition.getTilePixelX() - position.x) <= speed  * delta
                 && Math.abs(nextPosition.getTilePixelY() - position.y) <= speed  * delta;
     }
+    /* FIN DU CODE EMPRUNTÉ */
+
+    /*
+    CODE EMPRUNTÉ :
+       Les lignes suivantes sont basées sur la classe
+       provenant du site :
+      https://bitbucket.org/dermetfan/somelibgdxtests/src/db75d09d7c23a714da4d5847b3bcb2493de160fc/src/net/dermetfan/someLibgdxTests/screens/WaypointsTutorial.java?at=default&fileviewer=file-view-default
+      J'ai pris un bout de la méthode render pour être capable de dessiner le chemin parcouru par le personnage.
+      On dessine des cercles les différents points à atteindre et on dessine des lignes entre chaque point.
+      On dessine une ligne noire entre les deux points que le personnage parcoure à ce moment-là
+    */
 
     public void drawPathDebug(ShapeRenderer shapeRenderer){
         if(pathToWalk != null) {
@@ -147,7 +184,7 @@ public class BaseCharacter {
                     nextPosition.getTilePixelX(), nextPosition.getTilePixelY());
         }
     }
-
+    /* FIN DU CODE EMPRUNTÉ */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

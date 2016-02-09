@@ -1,13 +1,19 @@
 package ca.etsmtl.pfe.pathfinding;
 
-import com.badlogic.gdx.ai.pfa.indexed.DefaultIndexedGraph;
 import com.badlogic.gdx.utils.Array;
 
 import ca.etsmtl.pfe.gameworld.GameMap;
 
-//https://github.com/LetsMakeAnIndieGame/PhysicsShmup/blob/master/core/src/com/mygdx/game/pathfinding/GraphGenerator.java
 public class MapGraphGenerator {
 
+        /*
+       CODE EMPRUNTÉ :
+       Les lignes suivantes sont basées sur une classe
+       provenant du site :
+          //https://github.com/LetsMakeAnIndieGame/PhysicsShmup/blob/master/core/src/com/mygdx/game/pathfinding/GraphGenerator.java
+       J'ai pris la seul méthode de la classe et je l'ai améliorer. Cette méthode sert à génerer le graph de connection
+       de la map qui dit pour chaque tuiles vers qu'elle tuiles on peut aller.
+    */
     public MapGraph generateGraph(GameMap map) {
         int mapWidth = map.getNumberOfTileWidth();
         int mapHeight = map.getNumberOfTileHeigth();
@@ -58,4 +64,5 @@ public class MapGraphGenerator {
         }
         return new MapGraph(new Array<Node>(nodes));
     }
+    /* FIN DU CODE EMPRUNTÉ */
 }

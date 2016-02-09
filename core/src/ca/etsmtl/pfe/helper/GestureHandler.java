@@ -6,9 +6,6 @@ import com.badlogic.gdx.math.Vector2;
 
 import ca.etsmtl.pfe.gameworld.GameWorld;
 
-/*
-    this will be use to move the camera
- */
 
 public class GestureHandler implements GestureDetector.GestureListener {
     private GameWorld gameWorld;
@@ -66,7 +63,16 @@ public class GestureHandler implements GestureDetector.GestureListener {
     }
 
     @Override
-    //https://openclassrooms.com/forum/sujet/android-zoom-avec-gesturedetector-de-libgdx
+    /*
+       CODE EMPRUNTÉ :
+       Les lignes suivantes sont basées sur une classe
+       provenant du site :
+          https://openclassrooms.com/forum/sujet/android-zoom-avec-gesturedetector-de-libgdx
+       dans la réponse de berthommie rC Le 28 août 2014 à 23:27:56
+       J'ai pris les lignes suivantes qui servent à calculer le nouveau facteur du zoom de la caméra après
+       la gesture zoom que l'utilisateur a faite et on s'assure de ne pas dépasser 2 facteurs de zoom
+       soit MAX_ZOOM_OUT et MAX_ZOOM_IN
+    */
     public boolean zoom(float initialDistance, float distance) {
 
         if(originalDistanceZoom != initialDistance){
@@ -90,7 +96,7 @@ public class GestureHandler implements GestureDetector.GestureListener {
         }
         return true;
     }
-
+    /* FIN DU CODE EMPRUNTÉ */
     @Override
     public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2) {
         return false;
