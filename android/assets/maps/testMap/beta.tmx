@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="160" tileheight="160" nextobjectid="1">
  <tileset firstgid="1" name="tileset_alpha" tilewidth="160" tileheight="160" tilecount="15" columns="5">
-  <image source="assets_temp/tileset_alpha.png" width="851" height="480"/>
+  <image source="../../assets_temp/tileset_alpha.png" width="851" height="480"/>
  </tileset>
- <layer name="Calque de Tile 1" width="30" height="30">
+ <layer name="ground" width="30" height="30">
   <data encoding="base64" compression="zlib">
    eJztlNsKgCAQRDUr+/8vDqEoYnecWsMuPpyHXOhkzI53zvlKRIF03imk2SiQzieC5t3QnCW9CM27n7M5CgvrM/oudO8cQeGLXm/wHt8lZV7KF+tlc1Xa2ytY75vjLq/UC5HwWv/z271sL7Hesz3J7m/Oa+mkp3mlPPzdy2Tz6hwxKKAdW/dM62BE8zZvDS9ylvDWYAZqiAvO
+  </data>
+ </layer>
+ <layer name="collision" width="30" height="30">
+  <data encoding="base64" compression="zlib">
+   eJztlEEOwCAIBLn6/w/32hjLwiKlqZBwEZcRQYeIjCJf2dO6FtM0877m2nQ7uEzv73HvHKF6mbuw2B+5KG9mbsT1ztUuLmuZNUW46EyM9gSu51/6au8z/6QKrmanci2zycaZmY28X6RrbnPf5lr0EW6FX/6UCF8=
   </data>
  </layer>
 </map>

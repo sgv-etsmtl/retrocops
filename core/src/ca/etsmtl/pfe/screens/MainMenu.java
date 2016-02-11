@@ -5,12 +5,9 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -19,7 +16,16 @@ import com.badlogic.gdx.utils.viewport.FillViewport;
 import ca.etsmtl.pfe.helper.AssetLoader;
 
 
-//https://www.youtube.com/watch?v=q2qoiTqGsh8
+/*
+   CODE EMPRUNTÉ :
+   Les lignes suivantes sont basées une tutoriel
+   provenant du site :
+      //https://www.youtube.com/watch?v=q2qoiTqGsh8
+   J'ai pris la classe présenté dans le tutoriel et
+   je l'ai change pour avoir le nom du jeu affichée et avoir un button start que j'ai fait
+   en d'autre mots j'ai changer la valeur du string du label et les coordonneé pixel des différentes composante.
+   pour le skin je load un fichier que j'ai fait avec les button que j'ai fait.
+*/
 public class MainMenu implements Screen{
 
     private Stage stage;
@@ -116,3 +122,4 @@ public class MainMenu implements Screen{
         stage.dispose();
     }
 }
+/* FIN DU CODE EMPRUNTÉ */

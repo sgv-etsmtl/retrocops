@@ -4,13 +4,10 @@ package ca.etsmtl.pfe.ui;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FillViewport;
@@ -71,12 +68,6 @@ public class Menu {
 
         shapeRenderer.setColor(Color.RED);
         shapeRenderer.rect((cam.position.x - viewportWidth / 2), (cam.position.y - viewportHeight / 2), 320, viewportHeight);
-
-        shapeRenderer.setColor(0, 1.0f, 0, 1);
-        shapeRenderer.rect(cam.position.x, cam.position.y, 100, 100);
-
-        shapeRenderer.setColor(0, 1.0f, 0, 1);
-        shapeRenderer.rect((cam.position.x - viewportWidth / 2), (cam.position.y - viewportHeight / 2), 20, 20);
 
         shapeRenderer.end();
 

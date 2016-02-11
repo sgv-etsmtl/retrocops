@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="60" height="60" tilewidth="160" tileheight="160" nextobjectid="1">
+ <tileset firstgid="1" name="tileset_alpha" tilewidth="160" tileheight="160" tilecount="15" columns="5">
+  <image source="../../assets_temp/tileset_alpha.png" width="851" height="480"/>
+ </tileset>
+ <layer name="collision" width="60" height="60" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJztlkEKxDAMxHzt/z+890BCO5GXkspQCAhmUH3xVVXXx77V7PCUdXF92V59mdyU3/E9adwv26svk5vyr/qu7pCUp6yL1/CezYn77erVl8lNub5sr75Mbsr1ZXv1ZXJTvrpRdu+clHXxGt6zOXG/Xb36Mrkp15ft1ZfJTbm+bK++TG7KVzfK7p2Tsi5ew3s2J+63q1dfJjfl+rK9+jK5KdeX7dWXyU356kbZvXNS1sVreM/mxP129erL5KZcX7ZXXyY35fqyvfoyuSlf3Si7d07K/sWf/Ke7/K377erVl8lNub5sr75Mbsr1ZXvf6vul7wcKHB3s
+  </data>
+ </layer>
+ <layer name="ground" width="60" height="60">
+  <data encoding="base64" compression="zlib">
+   eJzt2EsOwyAMRVHiftL9r7higIQisElcC9TcgSe1iDg2g6duKaXtZrUrlfsfpXL/0ance3Yq915KjdzLOv8+FF68d/OK4RXFK4pXjPvKwL2s8+wXL97/8/ZKHP2rvah+/VtvP9aOyp6Oc6znqb0L67ve/bcsePHixYsXL9453oics3K+iszPZ+Y/eract95H66548eLFixcv3jneiJyzcr7y5tQzM/5lfrbeR+sMXrx48eLFi3eONyLnrJyvrDlZe9B279mPNz+3vokXL168ePHineONyDmr5au6ru6vzFnbkZafvfuz/jft5We8ePHixYt3Be+d6gsfAjvN
+  </data>
+ </layer>
+</map>

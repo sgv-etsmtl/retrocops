@@ -9,7 +9,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
 
+import ca.etsmtl.pfe.gameobjects.BaseCharacter;
 import ca.etsmtl.pfe.helper.AssetLoader;
 import ca.etsmtl.pfe.ui.Menu;
 
@@ -22,6 +24,7 @@ public class GameRenderer {
     private float cameraViewHeight;
     private BitmapFont writeFont;
     private SpriteBatch batcher;
+    private SpriteBatch characterBatcher;
     private Vector3 worldPosition;
 
     private float leftboundary;
@@ -32,6 +35,8 @@ public class GameRenderer {
     private ShapeRenderer shapeRenderer;
     private Vector3 ajustedCamPos;
     private Vector2 lastScreenPositionClik;
+
+    private Array<BaseCharacter> characterToDraw;
 
     public GameRenderer(float viewportWidth, float viewportHeight){
         currentMap = new GameMap();
@@ -48,6 +53,8 @@ public class GameRenderer {
         lastScreenPositionClik = new Vector2(0,0);
         calculateBoundary();
         writeFont = AssetLoader.whiteFont;
+        characterToDraw = new Array<BaseCharacter>();
+        characterBatcher = new SpriteBatch();
     }
 
     public void setCurrentMap(GameMap currentMap) {
@@ -63,9 +70,16 @@ public class GameRenderer {
         this.menu = menu;
     }
 
-    public boolean isPositionPixelIsInMenu(float x, float y){
-        transformScreenLocationToWorldLocation(x,y);
-        return worldPosition.x < cam.position.x - cameraViewWidth/2 + 320;
+    public void addCharacterToDraw(BaseCharacter baseCharacter){
+        characterToDraw.add(baseCharacter);
+    }
+
+    public void removeCharacterToDraw(BaseCharacter baseCharacter){
+        characterToDraw.removeValue(baseCharacter, false);
+    }
+
+    public void removeCharacterToDraw(int index){
+        characterToDraw.removeIndex(index);
     }
 
     public void render(float delta){
@@ -73,9 +87,10 @@ public class GameRenderer {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         cam.update();
-
         shapeRenderer.setProjectionMatrix(cam.combined);
         currentMap.render(cam);
+
+        drawCharacter(true);
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
@@ -85,6 +100,19 @@ public class GameRenderer {
         shapeRenderer.end();
 
         menu.drawMenu();
+
+        drawDebugInfo(true);
+
+
+    }
+
+    private void drawDebugInfo(boolean drawDebug){
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+
+        shapeRenderer.setColor(0, 1.0f, 0, 1);
+        shapeRenderer.rect(cam.position.x, cam.position.y, 100 * cam.zoom, 100 * cam.zoom);
+
+        shapeRenderer.end();
 
         //draw last clicked cell
         batcher.begin();
@@ -104,6 +132,22 @@ public class GameRenderer {
         batcher.end();
     }
 
+    private void drawCharacter(boolean drawDebug){
+        characterBatcher.setProjectionMatrix(cam.combined);
+        characterBatcher.begin();
+        for(BaseCharacter character : characterToDraw){
+            character.draw(characterBatcher);
+        }
+        characterBatcher.end();
+        if(drawDebug){
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            for(BaseCharacter character : characterToDraw){
+                character.drawPathDebug(shapeRenderer);
+            }
+            shapeRenderer.end();
+        }
+    }
+
     public void tranlateCamera(float x, float y) {
         if(cam.position.x + x < leftboundary ||
                 cam.position.x + x > rigthboundary){
@@ -121,12 +165,14 @@ public class GameRenderer {
     }
 
     public Vector3 transformScreenLocationToWorldLocation(float x, float y){
+        Vector3 position = new Vector3();
         lastScreenPositionClik.x = x;
         lastScreenPositionClik.y = y;
         worldPosition.x = x;
         worldPosition.y = y;
         cam.unproject(worldPosition);
-        return worldPosition;
+        position.set(worldPosition);
+        return position;
     }
 
     public void setCameraZoom(float newZoom){
@@ -144,9 +190,9 @@ public class GameRenderer {
     private void calculateBoundary(){
         leftboundary = cameraViewWidth / 2 - (320 * cam.zoom);
         //for an unknow reason we must a 60 factor to the width we can view to view the last right tiled
-        rigthboundary = currentMap.getMapWidth() - (cameraViewWidth / 2 - 60 * cam.zoom);
+        rigthboundary = currentMap.getMapPixelWidth() - (cameraViewWidth / 2 - 60 * cam.zoom);
         bottomboundary = cameraViewHeight / 2;
-        upperboundary = currentMap.getMapHeigth() - (cameraViewHeight / 2);
+        upperboundary = currentMap.getMapPixelHeigth() - (cameraViewHeight / 2);
     }
 
     private void ajusttCameraAfterZoom(){
@@ -172,6 +218,11 @@ public class GameRenderer {
     }
 
     public void dispose(){
+        characterBatcher.dispose();
+        writeFont.dispose();
+        batcher.dispose();
+        characterBatcher.dispose();
+        shapeRenderer.dispose();
 
     }
 
