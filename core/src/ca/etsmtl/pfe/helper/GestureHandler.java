@@ -27,13 +27,13 @@ public class GestureHandler implements GestureDetector.GestureListener {
         dragFirstPos.x = x;
         dragFirstPos.y = y;
         //for debug message click in the menu
-        gameWorld.getWorldPositioonFromScreenPosition(x, y);
+        gameWorld.getWorldPositionFromScreenPosition(x, y);
         return false;
     }
 
     @Override
     public boolean tap(float x, float y, int count, int button) {
-        gameWorld.getWorldPositioonFromScreenPosition(x,y);
+        gameWorld.getWorldPositionFromScreenPosition(x, y);
         gameWorld.changeCharacterPosition(x,y);
         return true;
     }
