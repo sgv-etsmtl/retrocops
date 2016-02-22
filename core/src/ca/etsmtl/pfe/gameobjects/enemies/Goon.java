@@ -19,6 +19,7 @@ public class Goon extends BaseCharacter{
 
     private StateMachine<Goon, GoonState> stateMachine;
     private boolean enemyInSight;
+    private boolean isDone;
     private int nbIdleTurns;
     private ArrayList<BaseCharacter> targetList;
     private ArrayList<Vector2> lastKnownEnemyPosition;
@@ -30,6 +31,7 @@ public class Goon extends BaseCharacter{
 
         this.nbIdleTurns = 0;
         this.enemyInSight = false;
+        this.isDone = false;
         this.targetList = new ArrayList<BaseCharacter>();
         this.lastKnownEnemyPosition = new ArrayList<Vector2>();
         setPosition(positionX*160, positionY*160);
@@ -37,11 +39,12 @@ public class Goon extends BaseCharacter{
 
     @Override
     public void update(float delta) {
+        this.isDone = false;
         stateMachine.update();
     }
 
     public void patrol(){
-       // Gdx.app.log("info", "PATROL PLACEHOLDER *******" + this);
+        Gdx.app.log("info", "PATROL PLACEHOLDER *******" + this);
     }
 
 

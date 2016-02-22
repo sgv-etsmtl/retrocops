@@ -119,16 +119,16 @@ public class GameRenderer {
 
         //in the menu
         if(menu.isMenuClicked(lastScreenPositionClik.x,lastScreenPositionClik.y)) {
-            writeFont.draw(batcher, "Click in menu", 60, 1050);
+            writeFont.draw(batcher, "Click in menu", 1200, 1050);
         }
         else {
             int cellX = (int) (worldPosition.x / 160);
             int cellY = (int) (worldPosition.y / 160);
 
-            writeFont.draw(batcher, "Cell click[" + cellX + "," + cellY + "]", 60, 1050);
+            writeFont.draw(batcher, "Cell click[" + cellX + "," + cellY + "]", 1200, 1050);
         }
-        writeFont.draw(batcher, "pos cam " + cam.position.x + ", " + cam.position.y, 60, 800);
-        writeFont.draw(batcher, "world click " + worldPosition.x + ", " + worldPosition.y, 60, 600);
+        writeFont.draw(batcher, "pos cam " + cam.position.x + ", " + cam.position.y, 1200, 800);
+        writeFont.draw(batcher, "world click " + worldPosition.x + ", " + worldPosition.y, 1200, 600);
         batcher.end();
     }
 

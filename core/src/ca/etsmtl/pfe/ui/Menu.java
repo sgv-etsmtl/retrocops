@@ -6,10 +6,11 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.graphics.Camera;
 
@@ -19,7 +20,7 @@ import ca.etsmtl.pfe.helper.AssetLoader;
 public class Menu {
 
     private Stage menuStage;
-    private TextButton test;
+    private TextButton switchButton;
     private ShapeRenderer shapeRenderer;
     private float viewportWidth;
     private float viewportHeight;
@@ -41,16 +42,54 @@ public class Menu {
         testButtonStyle.pressedOffsetY = -5;
         testButtonStyle.font = AssetLoader.gameFont;
 
-        test = new TextButton("test", testButtonStyle);
-        test.pad(10);
-        test.setBounds(80, 300, 200, 200);
-        test.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                Gdx.app.log("info", "test clicked!");
-            }
-        });
-        menuStage.addActor(test);
+        //placeholder menu buttons
+        final int BUTTON_SIZE = 200;
+        final int X_BOUND = 100;
+        final int PADDING = 10;
+        final int MARGIN = 20;
+
+        ChangeListener menuButtonsListener = new ChangeListener() {
+           @Override
+            public void changed(ChangeEvent event, Actor actor) {
+               Gdx.app.log("info", "event :  " + event.getTarget());
+               Gdx.app.log("info", "Actor :  " + actor);
+           }
+        };
+
+        switchButton = new TextButton("Switch", testButtonStyle);
+        switchButton.pad(10);
+        switchButton.setBounds(X_BOUND, 4 * (BUTTON_SIZE + PADDING) + MARGIN, BUTTON_SIZE, BUTTON_SIZE);
+        switchButton.addListener(menuButtonsListener);
+
+        TextButton itemButton = new TextButton("Item", testButtonStyle);
+        itemButton.pad(10);
+        itemButton.setBounds(X_BOUND, 3 * (BUTTON_SIZE + PADDING) + MARGIN, BUTTON_SIZE, BUTTON_SIZE);
+        itemButton.addListener(menuButtonsListener);
+
+        TextButton useButton = new TextButton("USE", testButtonStyle);
+        useButton.pad(10);
+        useButton.setBounds(X_BOUND, 2 * (BUTTON_SIZE + PADDING) + MARGIN, BUTTON_SIZE, BUTTON_SIZE);
+        useButton.addListener(menuButtonsListener);
+
+
+        TextButton overwatchButton = new TextButton("OW", testButtonStyle);
+        overwatchButton.pad(10);
+        overwatchButton.setBounds(X_BOUND, 1 * (BUTTON_SIZE + PADDING) + MARGIN, BUTTON_SIZE, BUTTON_SIZE);
+        overwatchButton.addListener(menuButtonsListener);
+
+        TextButton optionsButtons= new TextButton("Options", testButtonStyle);
+        optionsButtons.pad(10);
+        optionsButtons.setBounds(X_BOUND, 0 * (BUTTON_SIZE + PADDING) + MARGIN, BUTTON_SIZE, BUTTON_SIZE);
+        optionsButtons.addListener(menuButtonsListener);
+
+        menuStage.addActor(switchButton);
+        menuStage.addActor(itemButton);
+        menuStage.addActor(useButton);
+        menuStage.addActor(overwatchButton);
+        menuStage.addActor(optionsButtons);
+
+
+
 
         lastPostionAsk = new Vector3(0,0,0);
     }

@@ -1,6 +1,5 @@
 package ca.etsmtl.pfe.gameworld;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -17,10 +16,11 @@ public class GameWorld {
 
     private GameMap gameMap;
     private GameRenderer gameRenderer;
-    private BaseCharacter testPlayer;
+    private BaseCharacter player1;
     private Menu menu;
     private ArrayList<BaseCharacter> ennemies;
     private ArrayList<PlayerCharacter> playerCharacters;
+    private boolean playerTurnIsActive = true;
 
     public GameWorld(GameRenderer gameRenderer,Menu menu){
         this.gameRenderer = gameRenderer;
@@ -29,10 +29,21 @@ public class GameWorld {
         //this for debug
         gameMap = new GameMap("maps/testMap/beta2.tmx");
         gameRenderer.setCurrentMap(gameMap);
-        testPlayer = new PlayerCharacter();
-        testPlayer.setCharacterSprite(new Sprite(AssetLoader.testSprite, 160, 0, 160, 160));
-        testPlayer.setPosition(640, 480);
-        gameRenderer.addCharacterToDraw(testPlayer);
+
+
+        player1 = new PlayerCharacter();
+        player1.setCharacterSprite(new Sprite(AssetLoader.testSprite, 160, 0, 160, 160));
+        player1.setPosition(640, 480);
+
+        playerCharacters = new ArrayList<PlayerCharacter>();
+        playerCharacters.add((PlayerCharacter) player1);
+        //add player 2 here
+
+        for( BaseCharacter player : playerCharacters) {
+            gameRenderer.addCharacterToDraw(player);
+        }
+
+        gameRenderer.addCharacterToDraw(player1);
 
         ennemies = new ArrayList<BaseCharacter>();
         ennemies.add(new Goon(10, 11));
@@ -47,10 +58,13 @@ public class GameWorld {
 
     public void update(float delta){
 
-        testPlayer.update(delta);
-
-        for (BaseCharacter enemy : ennemies) {
-            enemy.update(delta);
+        if(playerTurnIsActive) {
+            player1.update(delta);
+        } else {
+            //AI
+            for (BaseCharacter enemy : ennemies) {
+                enemy.update(delta);
+            }
         }
     }
 
@@ -61,8 +75,8 @@ public class GameWorld {
     public void changeCharacterPosition(float screenX, float screenY){
         if(!isPositionPixelInMenu(screenX,screenY)) {
             Vector3 end = getWorldPositionFromScreenPosition(screenX, screenY);
-            Vector2 start = testPlayer.getPosition();
-            testPlayer.setPathToWalk(gameMap.getPath(start.x, start.y, end.x, end.y));
+            Vector2 start = player1.getPosition();
+            player1.setPathToWalk(gameMap.getPath(start.x, start.y, end.x, end.y));
         }
     }
 
