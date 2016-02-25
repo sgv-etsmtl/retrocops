@@ -95,5 +95,31 @@ public class Node implements IndexedNode<Node> {
         connections.add(new DefaultConnection<Node>(this, toNode));
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Node node = (Node) o;
+
+        if (index != node.index) return false;
+        if (tileX != node.tileX) return false;
+        if (tileY != node.tileY) return false;
+        if (tilePixelX != node.tilePixelX) return false;
+        if (tilePixelY != node.tilePixelY) return false;
+        return !(connections != null ? !connections.equals(node.connections) : node.connections != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = connections != null ? connections.hashCode() : 0;
+        result = 31 * result + index;
+        result = 31 * result + tileX;
+        result = 31 * result + tileY;
+        result = 31 * result + tilePixelX;
+        result = 31 * result + tilePixelY;
+        return result;
+    }
 }
 /* FIN DU CODE EMPRUNTÉ */

@@ -9,7 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 
 import ca.etsmtl.pfe.pathfinding.Node;
 
-public class BaseCharacter {
+public abstract class BaseCharacter {
 
     /*
     CODE EMPRUNTÉ :
@@ -43,7 +43,7 @@ public class BaseCharacter {
         setPosition(positionX, positionY);
     }
 
-    private void initializeVariable(){
+    protected void initializeVariable(){
         position = new Vector2(0,0);
         velocity = new Vector2(0,0);
         isAlive = true;
