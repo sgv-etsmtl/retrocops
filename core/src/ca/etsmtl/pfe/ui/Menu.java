@@ -7,9 +7,9 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.graphics.Camera;
@@ -20,7 +20,7 @@ import ca.etsmtl.pfe.helper.AssetLoader;
 public class Menu {
 
     private Stage menuStage;
-    private TextButton switchButton;
+    private TextButton switchButton, itemButton, useButton, overwatchButton, optionsButton;
     private ShapeRenderer shapeRenderer;
     private float viewportWidth;
     private float viewportHeight;
@@ -61,32 +61,42 @@ public class Menu {
         switchButton.setBounds(X_BOUND, 4 * (BUTTON_SIZE + PADDING) + MARGIN, BUTTON_SIZE, BUTTON_SIZE);
         switchButton.addListener(menuButtonsListener);
 
-        TextButton itemButton = new TextButton("Item", testButtonStyle);
+        itemButton = new TextButton("Item", testButtonStyle);
         itemButton.pad(10);
         itemButton.setBounds(X_BOUND, 3 * (BUTTON_SIZE + PADDING) + MARGIN, BUTTON_SIZE, BUTTON_SIZE);
         itemButton.addListener(menuButtonsListener);
 
-        TextButton useButton = new TextButton("USE", testButtonStyle);
+        useButton = new TextButton("USE", testButtonStyle);
         useButton.pad(10);
         useButton.setBounds(X_BOUND, 2 * (BUTTON_SIZE + PADDING) + MARGIN, BUTTON_SIZE, BUTTON_SIZE);
         useButton.addListener(menuButtonsListener);
 
 
-        TextButton overwatchButton = new TextButton("OW", testButtonStyle);
+        overwatchButton = new TextButton("OW", testButtonStyle);
         overwatchButton.pad(10);
         overwatchButton.setBounds(X_BOUND, 1 * (BUTTON_SIZE + PADDING) + MARGIN, BUTTON_SIZE, BUTTON_SIZE);
         overwatchButton.addListener(menuButtonsListener);
 
-        TextButton optionsButtons= new TextButton("Options", testButtonStyle);
-        optionsButtons.pad(10);
-        optionsButtons.setBounds(X_BOUND, 0 * (BUTTON_SIZE + PADDING) + MARGIN, BUTTON_SIZE, BUTTON_SIZE);
-        optionsButtons.addListener(menuButtonsListener);
+        optionsButton = new TextButton("Options", testButtonStyle);
+        optionsButton.pad(10);
+        optionsButton.setBounds(X_BOUND, 0 * (BUTTON_SIZE + PADDING) + MARGIN, BUTTON_SIZE, BUTTON_SIZE);
+        optionsButton.addListener(menuButtonsListener);
+
+
+    //    VerticalGroup verticalGroup = new VerticalGroup();
 
         menuStage.addActor(switchButton);
         menuStage.addActor(itemButton);
         menuStage.addActor(useButton);
         menuStage.addActor(overwatchButton);
-        menuStage.addActor(optionsButtons);
+        menuStage.addActor(optionsButton);
+
+//        verticalGroup.setVisible(true);
+//        verticalGroup.setPosition(160,1080);
+//        verticalGroup.pad(10);
+//        verticalGroup.space(MARGIN);
+//        menuStage.addActor(verticalGroup);
+
 
 
 

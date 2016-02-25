@@ -68,8 +68,9 @@ public class Goon extends BaseCharacter{
             @Override
             public void update(Goon goon) {
                 if (!goon.targetList.isEmpty()) {
-                    //shoot
+                    //shoot weakest target
                 } else if (!goon.lastKnownEnemyPosition.isEmpty()) {
+
                     //moveToward closest position
                 }
             }
