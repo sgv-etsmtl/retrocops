@@ -136,4 +136,20 @@ public class GameMap {
         currentMap.dispose();
     }
 
+    public void blockCell(float tilePixelX, float tilePixelY){
+
+        int tileX = (int)(tilePixelX / mapTilePixelWidth);
+        int tileY = (int)(tilePixelY / maptilePixelHeigth);
+
+        mapGraph.blockCell(tileX, tileY, numberOfTileWidth);
+    }
+
+    public void unblockCell(float tilePixelX, float tilePixelY){
+
+        int tileX = (int)(tilePixelX / mapTilePixelWidth);
+        int tileY = (int)(tilePixelY / maptilePixelHeigth);
+
+        mapGraph.unblockCell(tileX, tileY, numberOfTileWidth);
+    }
+
 }

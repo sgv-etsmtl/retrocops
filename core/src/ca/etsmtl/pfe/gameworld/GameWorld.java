@@ -1,65 +1,58 @@
 package ca.etsmtl.pfe.gameworld;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.ai.pfa.DefaultGraphPath;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
+import ca.etsmtl.pfe.gameloader.gameobjectinfo.GoonInfo;
+import ca.etsmtl.pfe.gameloader.gameobjectinfo.PlayerInfo;
+import ca.etsmtl.pfe.gameloader.mapinfo.GameLevelInfo;
+import ca.etsmtl.pfe.gameloader.mapinfo.LevelInfo;
 import ca.etsmtl.pfe.gameobjects.BaseCharacter;
 import ca.etsmtl.pfe.gameobjects.PlayerCharacter;
 import ca.etsmtl.pfe.gameobjects.enemies.Goon;
 import ca.etsmtl.pfe.helper.AssetLoader;
+import ca.etsmtl.pfe.helper.LevelLoader;
+import ca.etsmtl.pfe.pathfinding.Node;
 import ca.etsmtl.pfe.ui.Menu;
 
 public class GameWorld {
 
     private GameMap gameMap;
     private GameRenderer gameRenderer;
-    private BaseCharacter player1;
     private Menu menu;
     private ArrayList<BaseCharacter> ennemies;
     private ArrayList<PlayerCharacter> playerCharacters;
     private boolean playerTurnIsActive = true;
+    private PlayerCharacter selectedCharacter;
+    private int selectedCharacterIndex;
 
     public GameWorld(GameRenderer gameRenderer,Menu menu){
         this.gameRenderer = gameRenderer;
         this.menu = menu;
-
-        //this for debug
-        gameMap = new GameMap("maps/testMap/beta2.tmx");
+        gameMap = new GameMap();
         gameRenderer.setCurrentMap(gameMap);
-
-
-        player1 = new PlayerCharacter();
-        player1.setCharacterSprite(new Sprite(AssetLoader.testSprite, 160, 0, 160, 160));
-        player1.setPosition(640, 480);
-
-        playerCharacters = new ArrayList<PlayerCharacter>();
-        playerCharacters.add((PlayerCharacter) player1);
-        //add player 2 here
-
-        for( BaseCharacter player : playerCharacters) {
-            gameRenderer.addCharacterToDraw(player);
-        }
-
-        gameRenderer.addCharacterToDraw(player1);
-
         ennemies = new ArrayList<BaseCharacter>();
-        ennemies.add(new Goon(10, 11));
-        ennemies.add(new Goon(7, 7));
+        playerCharacters = new ArrayList<PlayerCharacter>(2);
 
-        for( BaseCharacter enemy : ennemies) {
-            gameRenderer.addCharacterToDraw(enemy);
-        }
-
-
+        //this is for debug
+        LevelLoader.loadLever(this, 0);
+        selectedCharacterIndex = 0;
+        selectedCharacter = playerCharacters.get(selectedCharacterIndex);
     }
 
     public void update(float delta){
 
         if(playerTurnIsActive) {
-            player1.update(delta);
+            if(selectedCharacter != null) {
+                selectedCharacter.update(delta);
+            }
         } else {
             //AI
             for (BaseCharacter enemy : ennemies) {
@@ -73,10 +66,17 @@ public class GameWorld {
     }
 
     public void changeCharacterPosition(float screenX, float screenY){
-        if(!isPositionPixelInMenu(screenX,screenY)) {
+        if(!isPositionPixelInMenu(screenX,screenY) && selectedCharacter != null) {
             Vector3 end = getWorldPositionFromScreenPosition(screenX, screenY);
-            Vector2 start = player1.getPosition();
-            player1.setPathToWalk(gameMap.getPath(start.x, start.y, end.x, end.y));
+            Vector2 start = selectedCharacter.getPosition();
+            DefaultGraphPath<Node> path = gameMap.getPath(start.x, start.y, end.x, end.y);
+            if(path != null && path.nodes.size > 0){
+                Node startNode = path.get(0);
+                Node endNode = path.get(path.nodes.size - 1);
+                gameMap.unblockCell(startNode.getTilePixelX(), startNode.getTilePixelY());
+                gameMap.blockCell(endNode.getTilePixelX(), endNode.getTilePixelY());
+                selectedCharacter.setPathToWalk(path);
+            }
         }
     }
 
@@ -85,7 +85,7 @@ public class GameWorld {
     }
 
     public boolean isPositionPixelInMenu(float screenX, float screenY){
-        return menu.isMenuClicked(screenX,screenY);
+        return menu.isMenuClicked(screenX, screenY);
     }
 
     public void setCameraZoom(float newZoom){
@@ -94,6 +94,35 @@ public class GameWorld {
 
     public float getCameraZoom(){
         return gameRenderer.getCameraZoom();
+    }
+
+    public void addCharacterPlayer(PlayerCharacter player){
+        playerCharacters.add(player);
+        gameRenderer.addCharacterToDraw(player);
+        gameMap.blockCell(player.getPosition().x, player.getPosition().y);
+    }
+
+    public void addEnnemie(BaseCharacter ennemie){
+        ennemies.add(ennemie);
+        gameRenderer.addCharacterToDraw(ennemie);
+        gameMap.blockCell(ennemie.getPosition().x, ennemie.getPosition().y);
+    }
+
+    public void clearWorld(){
+        playerCharacters.clear();
+        ennemies.clear();
+        gameRenderer.deleteAllCharacterToDraw();
+    }
+
+    public void changeMap(String newMapFilePath){
+        gameMap.loadMap(newMapFilePath);
+        gameRenderer.recalculateBoundary();
+    }
+
+    public void changeSelectedCharacter(){
+        selectedCharacterIndex = (selectedCharacterIndex  + 1) % playerCharacters.size();
+        selectedCharacter = playerCharacters.get(selectedCharacterIndex);
+        //change camera lookAt
     }
 
 }

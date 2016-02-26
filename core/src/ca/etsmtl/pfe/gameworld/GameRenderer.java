@@ -82,6 +82,10 @@ public class GameRenderer {
         characterToDraw.removeIndex(index);
     }
 
+    public void deleteAllCharacterToDraw(){
+        characterToDraw.clear();
+    }
+
     public void render(float delta){
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -185,6 +189,10 @@ public class GameRenderer {
 
     public float getCameraZoom(){
         return cam.zoom;
+    }
+
+    public void recalculateBoundary(){
+        calculateBoundary();
     }
 
     private void calculateBoundary(){

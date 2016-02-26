@@ -57,7 +57,9 @@ public abstract class BaseCharacter {
     public void setPosition(float positionX, float positionY) {
         this.position.x = positionX;
         this.position.y = positionY;
-        spriteCharacter.setPosition(positionX,positionY);
+        if(spriteCharacter != null) {
+            spriteCharacter.setPosition(positionX, positionY);
+        }
     }
 
     public Vector2 getVelocity() {
@@ -83,6 +85,7 @@ public abstract class BaseCharacter {
 
     public void setCharacterSprite(Sprite spriteCharacter) {
         this.spriteCharacter = spriteCharacter;
+        this.spriteCharacter.setPosition(position.x, position.y);
     }
 
     public void setPathToWalk(DefaultGraphPath<Node> pathToWalk) {
