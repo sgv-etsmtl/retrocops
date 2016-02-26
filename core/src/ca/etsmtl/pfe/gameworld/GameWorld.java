@@ -66,7 +66,8 @@ public class GameWorld {
     }
 
     public void changeCharacterPosition(float screenX, float screenY){
-        if(!isPositionPixelInMenu(screenX,screenY) && selectedCharacter != null) {
+        if(!isPositionPixelInMenu(screenX,screenY) && selectedCharacter != null &&
+                selectedCharacter.getStat() == BaseCharacter.BaseCharacterStat.waiting) {
             Vector3 end = getWorldPositionFromScreenPosition(screenX, screenY);
             Vector2 start = selectedCharacter.getPosition();
             DefaultGraphPath<Node> path = gameMap.getPath(start.x, start.y, end.x, end.y);
@@ -120,9 +121,11 @@ public class GameWorld {
     }
 
     public void changeSelectedCharacter(){
-        selectedCharacterIndex = (selectedCharacterIndex  + 1) % playerCharacters.size();
-        selectedCharacter = playerCharacters.get(selectedCharacterIndex);
-        //change camera lookAt
+        if(selectedCharacter.getStat() == BaseCharacter.BaseCharacterStat.waiting) {
+            selectedCharacterIndex = (selectedCharacterIndex + 1) % playerCharacters.size();
+            selectedCharacter = playerCharacters.get(selectedCharacterIndex);
+            //change camera lookAt
+        }
     }
 
 }
