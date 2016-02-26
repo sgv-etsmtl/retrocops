@@ -43,8 +43,8 @@ public class GameWorld {
 
         //this is for debug
         LevelLoader.loadLever(this, 0);
-        selectedCharacterIndex = 0;
-        selectedCharacter = playerCharacters.get(selectedCharacterIndex);
+        selectedCharacterIndex = -1;
+        changeSelectedCharacter();
     }
 
     public void update(float delta){
@@ -52,6 +52,9 @@ public class GameWorld {
         if(playerTurnIsActive) {
             if(selectedCharacter != null) {
                 selectedCharacter.update(delta);
+                if (selectedCharacter.getStat() == BaseCharacter.BaseCharacterStat.moving) {
+                    gameRenderer.lookAtPlayer(selectedCharacter.getPosition());
+                }
             }
         } else {
             //AI
@@ -110,21 +113,28 @@ public class GameWorld {
     }
 
     public void clearWorld(){
+        selectedCharacter = null;
+        selectedCharacterIndex = -1;
         playerCharacters.clear();
         ennemies.clear();
         gameRenderer.deleteAllCharacterToDraw();
+        gameRenderer.resetCamera();
     }
 
     public void changeMap(String newMapFilePath){
         gameMap.loadMap(newMapFilePath);
         gameRenderer.recalculateBoundary();
+        gameRenderer.resetCamera();
     }
 
     public void changeSelectedCharacter(){
-        if(selectedCharacter.getStat() == BaseCharacter.BaseCharacterStat.waiting) {
-            selectedCharacterIndex = (selectedCharacterIndex + 1) % playerCharacters.size();
-            selectedCharacter = playerCharacters.get(selectedCharacterIndex);
-            //change camera lookAt
+        if(playerCharacters != null) {
+            if (selectedCharacter == null || selectedCharacter.getStat() == BaseCharacter.BaseCharacterStat.waiting) {
+                selectedCharacterIndex = (selectedCharacterIndex + 1) % playerCharacters.size();
+                selectedCharacter = playerCharacters.get(selectedCharacterIndex);
+                //change camera lookAt
+                gameRenderer.lookAtPlayer(selectedCharacter.getPosition());
+            }
         }
     }
 

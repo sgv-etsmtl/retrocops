@@ -164,6 +164,7 @@ public class GameRenderer {
         }
         if(x != 0 || y != 0){
             cam.translate(x, y);
+            cam.update();
         }
 
     }
@@ -184,7 +185,7 @@ public class GameRenderer {
         cameraViewWidth = cam.viewportWidth * newZoom;
         cam.zoom = newZoom;
         calculateBoundary();
-        ajusttCameraAfterZoom();
+        ajusttCameraAfterZoomOrLookAt();
     }
 
     public float getCameraZoom(){
@@ -203,7 +204,7 @@ public class GameRenderer {
         upperboundary = currentMap.getMapPixelHeigth() - (cameraViewHeight / 2);
     }
 
-    private void ajusttCameraAfterZoom(){
+    private void ajusttCameraAfterZoomOrLookAt(){
         ajustedCamPos.x = cam.position.x;
         ajustedCamPos.y = cam.position.y;
         ajustedCamPos.z = 0;
@@ -231,7 +232,21 @@ public class GameRenderer {
         batcher.dispose();
         characterBatcher.dispose();
         shapeRenderer.dispose();
+    }
 
+    public void lookAtPlayer(float playerPosX, float playerPosY){
+        cam.position.set(playerPosX, playerPosY, 0);
+        ajusttCameraAfterZoomOrLookAt();
+        cam.update();
+    }
+
+    public void lookAtPlayer(Vector2 positionPlayer){
+        lookAtPlayer(positionPlayer.x, positionPlayer.y);
+    }
+
+    public void resetCamera(){
+        cam.position.set(cameraViewWidth / 2, cameraViewHeight / 2,0);
+        setCameraZoom(1);
     }
 
 }
