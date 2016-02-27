@@ -13,7 +13,7 @@ import com.badlogic.gdx.utils.Array;
 
 import ca.etsmtl.pfe.gameobjects.BaseCharacter;
 import ca.etsmtl.pfe.helper.AssetLoader;
-import ca.etsmtl.pfe.ui.Menu;
+import ca.etsmtl.pfe.ui.gamemenu.Menu;
 
 public class GameRenderer {
 

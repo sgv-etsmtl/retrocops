@@ -12,19 +12,21 @@ import ca.etsmtl.pfe.gameloader.mapinfo.LevelInfo;
 import ca.etsmtl.pfe.gameworld.GameWorld;
 
 public class LevelLoader {
-    private static String gemaLevelsInfoPath = "levelsInfo/gameLevelsInfo.json";
+    private static String gameLevelsInfoPath = "levelsInfo/gameLevelsInfo.json";
     private static GameLevelInfo gameLevelInfo;
     private static Gson gson;
     private static boolean loaded = false;
 
     public static void loadInfo(){
         gson = new Gson();
-        FileHandle file = Gdx.files.internal(gemaLevelsInfoPath);
+        FileHandle file = Gdx.files.internal(gameLevelsInfoPath);
         gameLevelInfo = gson.fromJson(file.readString(), GameLevelInfo.class);
         loaded = true;
     }
 
-
+    public static GameLevelInfo getGameLevelInfo() {
+        return gameLevelInfo;
+    }
 
     public static LevelInfo getLevelInfo(int indexLeve){
         if(!loaded ||

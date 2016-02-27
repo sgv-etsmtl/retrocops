@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 
 import ca.etsmtl.pfe.helper.AssetLoader;
+import ca.etsmtl.pfe.retrocops.RetroCops;
 
 
 /*
@@ -33,12 +34,12 @@ public class MainMenu implements Screen{
     private TextButton startButton;
     private Label gameName;
 
-    private Game currentGame;
+    private RetroCops currentGame;
     private float width;
     private float heigth;
 
 
-    public MainMenu(float width, float heigth, Game currentGame){
+    public MainMenu(float width, float heigth, RetroCops currentGame){
         this.width = width;
         this.heigth = heigth;
         this.currentGame = currentGame;
@@ -67,7 +68,7 @@ public class MainMenu implements Screen{
         startButton.pad(10);
         startButton.addListener(new ChangeListener() {
             public void changed (ChangeEvent event, Actor actor) {
-                currentGame.setScreen(new GameScreen(width,heigth));
+                currentGame.changeScrenToLevelSelectScreen();
             }
         });
 
@@ -82,9 +83,11 @@ public class MainMenu implements Screen{
         table.debug();
 
         stage.addActor(table);
-
         Gdx.input.setInputProcessor(stage);
+    }
 
+    public void changeInputToMainMenuScreen(){
+        //Gdx.input.setInputProcessor(stage);
     }
 
     @Override

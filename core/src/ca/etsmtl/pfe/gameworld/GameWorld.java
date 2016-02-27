@@ -1,26 +1,16 @@
 package ca.etsmtl.pfe.gameworld;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.pfa.DefaultGraphPath;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
-import ca.etsmtl.pfe.gameloader.gameobjectinfo.GoonInfo;
-import ca.etsmtl.pfe.gameloader.gameobjectinfo.PlayerInfo;
-import ca.etsmtl.pfe.gameloader.mapinfo.GameLevelInfo;
-import ca.etsmtl.pfe.gameloader.mapinfo.LevelInfo;
 import ca.etsmtl.pfe.gameobjects.BaseCharacter;
 import ca.etsmtl.pfe.gameobjects.PlayerCharacter;
-import ca.etsmtl.pfe.gameobjects.enemies.Goon;
-import ca.etsmtl.pfe.helper.AssetLoader;
 import ca.etsmtl.pfe.helper.LevelLoader;
 import ca.etsmtl.pfe.pathfinding.Node;
-import ca.etsmtl.pfe.ui.Menu;
+import ca.etsmtl.pfe.ui.gamemenu.Menu;
 
 public class GameWorld {
 
