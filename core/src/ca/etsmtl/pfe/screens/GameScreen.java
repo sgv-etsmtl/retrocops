@@ -22,11 +22,12 @@ public class GameScreen implements Screen {
         gameRenderer = new GameRenderer(width,heigth);
         gameWorld = new GameWorld(gameRenderer,gameMenu);
         gameRenderer.setMenu(gameMenu);
+        gameMenu.setGameWorld(gameWorld);
 
         InputMultiplexer inputMultiplexer = new InputMultiplexer();
+        inputMultiplexer.addProcessor(gameMenu.getMenuStage());
         GestureDetector gestureDetector = new GestureDetector(new GestureHandler(gameWorld));
         inputMultiplexer.addProcessor(gestureDetector);
-        inputMultiplexer.addProcessor(gameMenu.getMenuStage());
 
         Gdx.input.setInputProcessor(inputMultiplexer);
     }

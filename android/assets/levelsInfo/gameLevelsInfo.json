@@ -1,0 +1,14 @@
+{
+  "levelsName": [
+   "beta 1",
+   "beta 2"
+  ],
+  "pathsLevelInfo": [
+   "levelsInfo/levelBetaInfo.json",
+   "levelsInfo/levelBeta2Info.json"
+  ],
+  "pathsLevelImage": [
+   "maps/testMap/beta.png",
+   "maps/testMap/beta2.png"
+  ]
+}

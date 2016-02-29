@@ -8,23 +8,30 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.graphics.Camera;
 
+import ca.etsmtl.pfe.gameworld.GameWorld;
 import ca.etsmtl.pfe.helper.AssetLoader;
 
 
 public class Menu {
 
     private Stage menuStage;
-    private TextButton switchButton, itemButton, useButton, overwatchButton, optionsButton;
+    private ImageButton switchButton;
+    private TextButton itemButton, useButton, overwatchButton, optionsButton;
+    private Table verticalTable;
     private ShapeRenderer shapeRenderer;
     private float viewportWidth;
     private float viewportHeight;
     private OrthographicCamera menuCam;
+    private MenuClickListenerHandler menuClickListenerHandler;
+    private GameWorld gameWorld;
 
     private Vector3 lastPostionAsk;
 
@@ -44,65 +51,56 @@ public class Menu {
 
         //placeholder menu buttons
         final int BUTTON_SIZE = 200;
-        final int X_BOUND = 100;
-        final int PADDING = 10;
-        final int MARGIN = 20;
+        final int PADDING = 5;
 
-        ChangeListener menuButtonsListener = new ChangeListener() {
-           @Override
-            public void changed(ChangeEvent event, Actor actor) {
-               Gdx.app.log("info", "event :  " + event.getTarget());
-               Gdx.app.log("info", "Actor :  " + actor);
+        ImageButton.ImageButtonStyle switchCharacterStyle = new ImageButton.ImageButtonStyle();
+        switchCharacterStyle.imageUp = AssetLoader.skinSwitchCharacter.getDrawable("switchCharacter.up");
+        switchCharacterStyle.imageDown = AssetLoader.skinSwitchCharacter.getDrawable("switchCharacter.down");
+        switchButton = new ImageButton(switchCharacterStyle);
 
-           }
-        };
+        menuClickListenerHandler = new MenuClickListenerHandler(switchButton,itemButton,useButton,
+                                                                overwatchButton,optionsButton, gameWorld);
 
-        switchButton = new TextButton("Switch", testButtonStyle);
-        switchButton.pad(10);
-        switchButton.setBounds(X_BOUND, 4 * (BUTTON_SIZE + PADDING) + MARGIN, BUTTON_SIZE, BUTTON_SIZE);
-        switchButton.addListener(menuButtonsListener);
+        switchButton.addListener(menuClickListenerHandler);
 
         itemButton = new TextButton("Item", testButtonStyle);
-        itemButton.pad(10);
-        itemButton.setBounds(X_BOUND, 3 * (BUTTON_SIZE + PADDING) + MARGIN, BUTTON_SIZE, BUTTON_SIZE);
-        itemButton.addListener(menuButtonsListener);
+        itemButton.addListener(menuClickListenerHandler);
 
         useButton = new TextButton("USE", testButtonStyle);
-        useButton.pad(10);
-        useButton.setBounds(X_BOUND, 2 * (BUTTON_SIZE + PADDING) + MARGIN, BUTTON_SIZE, BUTTON_SIZE);
-        useButton.addListener(menuButtonsListener);
-
-
+        useButton.addListener(menuClickListenerHandler);
+        
         overwatchButton = new TextButton("OW", testButtonStyle);
-        overwatchButton.pad(10);
-        overwatchButton.setBounds(X_BOUND, 1 * (BUTTON_SIZE + PADDING) + MARGIN, BUTTON_SIZE, BUTTON_SIZE);
-        overwatchButton.addListener(menuButtonsListener);
+        overwatchButton.addListener(menuClickListenerHandler);
 
         optionsButton = new TextButton("Options", testButtonStyle);
-        optionsButton.pad(10);
-        optionsButton.setBounds(X_BOUND, 0 * (BUTTON_SIZE + PADDING) + MARGIN, BUTTON_SIZE, BUTTON_SIZE);
-        optionsButton.addListener(menuButtonsListener);
+        optionsButton.addListener(menuClickListenerHandler);
 
 
-    //    VerticalGroup verticalGroup = new VerticalGroup();
+        verticalTable = new Table();
+        verticalTable.setBounds(30, 0, 300, viewportHeight);
 
-        menuStage.addActor(switchButton);
-        menuStage.addActor(itemButton);
-        menuStage.addActor(useButton);
-        menuStage.addActor(overwatchButton);
-        menuStage.addActor(optionsButton);
-
-//        verticalGroup.setVisible(true);
-//        verticalGroup.setPosition(160,1080);
-//        verticalGroup.pad(10);
-//        verticalGroup.space(MARGIN);
-//        menuStage.addActor(verticalGroup);
-
-
-
-
+        verticalTable.add(switchButton).width(BUTTON_SIZE).height(BUTTON_SIZE);
+        verticalTable.row();
+        verticalTable.add(itemButton).width(BUTTON_SIZE).height(BUTTON_SIZE).pad(PADDING);
+        verticalTable.row();
+        verticalTable.add(useButton).width(BUTTON_SIZE).height(BUTTON_SIZE).pad(PADDING);
+        verticalTable.row();
+        verticalTable.add(overwatchButton).width(BUTTON_SIZE).height(BUTTON_SIZE).pad(PADDING);
+        verticalTable.row();
+        verticalTable.add(optionsButton).width(BUTTON_SIZE).height(BUTTON_SIZE);
+        switchButton.getImageCell().expand().fill();
+        menuStage.addActor(verticalTable);
 
         lastPostionAsk = new Vector3(0,0,0);
+    }
+
+    public GameWorld getGameWorld() {
+        return gameWorld;
+    }
+
+    public void setGameWorld(GameWorld gameWorld) {
+        this.gameWorld = gameWorld;
+        menuClickListenerHandler.setGameWorld(gameWorld);
     }
 
     public Stage getMenuStage() {
