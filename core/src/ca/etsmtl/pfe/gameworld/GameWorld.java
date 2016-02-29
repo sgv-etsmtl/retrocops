@@ -20,7 +20,7 @@ import ca.etsmtl.pfe.gameobjects.enemies.Goon;
 import ca.etsmtl.pfe.helper.AssetLoader;
 import ca.etsmtl.pfe.helper.LevelLoader;
 import ca.etsmtl.pfe.pathfinding.Node;
-import ca.etsmtl.pfe.ui.Menu;
+import ca.etsmtl.pfe.ui.gamemenu.Menu;
 
 public class GameWorld {
 
@@ -33,7 +33,6 @@ public class GameWorld {
     private PlayerCharacter selectedCharacter;
     private int selectedCharacterIndex;
     public final int DEFAULT_TILE_SIZE = 160;
-
     
     public GameWorld(GameRenderer gameRenderer,Menu menu){
         this.gameRenderer = gameRenderer;
@@ -47,7 +46,6 @@ public class GameWorld {
         //this is for debug
         LevelLoader.loadLever(this, 0);
         selectedCharacterIndex = -1;
-        changeSelectedCharacter();
     }
 
     public void update(float delta){

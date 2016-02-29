@@ -1,4 +1,4 @@
-package ca.etsmtl.pfe.ui;
+package ca.etsmtl.pfe.ui.gamemenu;
 
 
 import com.badlogic.gdx.scenes.scene2d.InputEvent;

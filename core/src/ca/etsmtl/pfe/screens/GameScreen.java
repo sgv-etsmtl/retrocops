@@ -1,6 +1,7 @@
 package ca.etsmtl.pfe.screens;
 
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
@@ -9,26 +10,37 @@ import com.badlogic.gdx.input.GestureDetector;
 import ca.etsmtl.pfe.gameworld.GameRenderer;
 import ca.etsmtl.pfe.gameworld.GameWorld;
 import ca.etsmtl.pfe.helper.GestureHandler;
-import ca.etsmtl.pfe.ui.Menu;
+import ca.etsmtl.pfe.retrocops.RetroCops;
+import ca.etsmtl.pfe.ui.gamemenu.Menu;
 
 public class GameScreen implements Screen {
 
     private GameWorld gameWorld;
     private GameRenderer gameRenderer;
     private Menu gameMenu;
+    private RetroCops currentGame;
+    private InputMultiplexer inputMultiplexer;
 
-    public GameScreen(float width, float heigth){
+    public GameScreen(float width, float heigth, RetroCops currentGame){
         gameMenu = new Menu(width,heigth);
         gameRenderer = new GameRenderer(width,heigth);
         gameWorld = new GameWorld(gameRenderer,gameMenu);
         gameRenderer.setMenu(gameMenu);
         gameMenu.setGameWorld(gameWorld);
+        this.currentGame = currentGame;
 
-        InputMultiplexer inputMultiplexer = new InputMultiplexer();
+        inputMultiplexer = new InputMultiplexer();
         inputMultiplexer.addProcessor(gameMenu.getMenuStage());
         GestureDetector gestureDetector = new GestureDetector(new GestureHandler(gameWorld));
         inputMultiplexer.addProcessor(gestureDetector);
 
+    }
+
+    public GameWorld getGameWorld() {
+        return gameWorld;
+    }
+
+    public void changeInputToGameScreen(){
         Gdx.input.setInputProcessor(inputMultiplexer);
     }
 
