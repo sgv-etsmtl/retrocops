@@ -49,9 +49,10 @@ public class LevelLoader {
                 gameWorld.addCharacterPlayer(players.getPlayerFromInfo());
             }
 
-            for(GoonInfo ennemie : levelInfo.getGoonEnnemies()){
-                gameWorld.addEnnemie(ennemie.getGoonFromInfo());
+            for(GoonInfo enemies : levelInfo.getGoonEnnemies()){
+                gameWorld.addEnemy(enemies.getGoonFromInfo(gameWorld));
             }
+            gameWorld.changeSelectedCharacter();
         }
     }
 }

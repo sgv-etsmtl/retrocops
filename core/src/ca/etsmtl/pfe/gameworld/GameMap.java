@@ -24,6 +24,11 @@ public class GameMap {
     private float mapPixelWidth;
     private float maptilePixelHeigth;
     private float mapTilePixelWidth;
+
+    public MapGraph getMapGraph() {
+        return mapGraph;
+    }
+
     private MapGraph mapGraph;
     private MapGraphGenerator mapGraphGenerator;
     private int numberOfTileWidth;
@@ -127,6 +132,14 @@ public class GameMap {
 
         pathFinder.searchNodePath(mapGraph.getNodeByTileXY(tileStartX, tileStartY, numberOfTileWidth),
                 mapGraph.getNodeByTileXY(tileEndX, tileEndY, numberOfTileWidth),walkingHeuristic,path);
+
+        return path;
+    }
+
+    public DefaultGraphPath<Node> getPathFromNodes(Node fromNode, Node toNode){
+        DefaultGraphPath<Node> path = new DefaultGraphPath<Node>();
+
+        pathFinder.searchNodePath(fromNode, toNode, walkingHeuristic,path);
 
         return path;
     }

@@ -1,13 +1,23 @@
 package ca.etsmtl.pfe.gameworld;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.pfa.DefaultGraphPath;
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
+import ca.etsmtl.pfe.gameloader.gameobjectinfo.GoonInfo;
+import ca.etsmtl.pfe.gameloader.gameobjectinfo.PlayerInfo;
+import ca.etsmtl.pfe.gameloader.mapinfo.GameLevelInfo;
+import ca.etsmtl.pfe.gameloader.mapinfo.LevelInfo;
 import ca.etsmtl.pfe.gameobjects.BaseCharacter;
 import ca.etsmtl.pfe.gameobjects.PlayerCharacter;
+import ca.etsmtl.pfe.gameobjects.enemies.Goon;
+import ca.etsmtl.pfe.helper.AssetLoader;
 import ca.etsmtl.pfe.helper.LevelLoader;
 import ca.etsmtl.pfe.pathfinding.Node;
 import ca.etsmtl.pfe.ui.gamemenu.Menu;
@@ -19,13 +29,16 @@ public class GameWorld {
     private Menu menu;
     private ArrayList<BaseCharacter> ennemies;
     private ArrayList<PlayerCharacter> playerCharacters;
-    private boolean playerTurnIsActive = true;
+    private boolean playerTurnIsActive;
     private PlayerCharacter selectedCharacter;
     private int selectedCharacterIndex;
+    public final int DEFAULT_TILE_SIZE = 160;
+
 
     public GameWorld(GameRenderer gameRenderer,Menu menu){
         this.gameRenderer = gameRenderer;
         this.menu = menu;
+        this.playerTurnIsActive = true;
         gameMap = new GameMap();
         gameRenderer.setCurrentMap(gameMap);
         ennemies = new ArrayList<BaseCharacter>();
@@ -34,12 +47,12 @@ public class GameWorld {
         //this is for debug
         LevelLoader.loadLever(this, 0);
         selectedCharacterIndex = -1;
-        changeSelectedCharacter();
     }
 
     public void update(float delta){
 
         if(playerTurnIsActive) {
+
             if(selectedCharacter != null) {
                 selectedCharacter.update(delta);
                 if (selectedCharacter.getStat() == BaseCharacter.BaseCharacterStat.moving) {
@@ -48,9 +61,11 @@ public class GameWorld {
             }
         } else {
             //AI
+            Gdx.app.log("info", "AI TURN OMG");
             for (BaseCharacter enemy : ennemies) {
                 enemy.update(delta);
             }
+            playerTurnIsActive = true;
         }
     }
 
@@ -67,11 +82,25 @@ public class GameWorld {
             if(path != null && path.nodes.size > 0){
                 Node startNode = path.get(0);
                 Node endNode = path.get(path.nodes.size - 1);
-                gameMap.unblockCell(startNode.getTilePixelX(), startNode.getTilePixelY());
-                gameMap.blockCell(endNode.getTilePixelX(), endNode.getTilePixelY());
-                selectedCharacter.setPathToWalk(path);
+                if(!startNode.equals(endNode)) {
+                    gameMap.unblockCell(startNode.getTilePixelX(), startNode.getTilePixelY());
+                    gameMap.blockCell(endNode.getTilePixelX(), endNode.getTilePixelY());
+                    selectedCharacter.setPathToWalk(path);
+                }
             }
         }
+    }
+
+    public void changeCharacterTilePosition(Node fromNode, Node toNode, BaseCharacter baseCharacter){
+
+            DefaultGraphPath<Node> path = gameMap.getPathFromNodes(fromNode, toNode);
+            if(path != null && path.nodes.size > 0){
+                Node startNode = path.get(0);
+                Node endNode = path.get(path.nodes.size - 1);
+                gameMap.unblockCell(startNode.getTilePixelX(), startNode.getTilePixelY());
+                gameMap.blockCell(endNode.getTilePixelX(), endNode.getTilePixelY());
+                baseCharacter.setPathToWalk(path);
+            }
     }
 
     public Vector3 getWorldPositionFromScreenPosition(float screenX, float screenY){
@@ -90,13 +119,18 @@ public class GameWorld {
         return gameRenderer.getCameraZoom();
     }
 
+    public GameMap getGameMap() {
+        return gameMap;
+    }
+
     public void addCharacterPlayer(PlayerCharacter player){
+
         playerCharacters.add(player);
         gameRenderer.addCharacterToDraw(player);
         gameMap.blockCell(player.getPosition().x, player.getPosition().y);
     }
 
-    public void addEnnemie(BaseCharacter ennemie){
+    public void addEnemy(BaseCharacter ennemie){
         ennemies.add(ennemie);
         gameRenderer.addCharacterToDraw(ennemie);
         gameMap.blockCell(ennemie.getPosition().x, ennemie.getPosition().y);
