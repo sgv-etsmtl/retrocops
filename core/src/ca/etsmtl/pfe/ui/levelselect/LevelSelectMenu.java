@@ -37,7 +37,7 @@ public class LevelSelectMenu {
         flingTime = 0.1f;
         pageSpacing = 25;
         numberOfLevelByRow = 4;
-        numberOfRowByPage = numberOfLevelByRow * 2;
+        numberOfRowByPage = numberOfLevelByRow * 3;
         levelSelectPages.setFlingTime(flingTime);
         levelSelectPages.setPageSpacing(pageSpacing);
         gameLevelInfo = LevelLoader.getGameLevelInfo();
@@ -45,8 +45,6 @@ public class LevelSelectMenu {
         levelLabelStyle = new Label.LabelStyle();
         levelLabelStyle.font = AssetLoader.gameFont;
         buttonLevelSelectStyle = new Button.ButtonStyle();
-        buttonLevelSelectStyle.up = null;
-        buttonLevelSelectStyle.down = null;
         container = new Table();
         levelSelectStage.addActor(container);
         container.setFillParent(true);
@@ -78,13 +76,13 @@ public class LevelSelectMenu {
         }
     }
 
-    private Button getLevelButton(int levelIndex, String levelImagePath){
-        Button button = new Button(buttonLevelSelectStyle);
-        button.setSize(200,200);
+    private LevelSelectButton getLevelButton(int levelIndex, String levelImagePath){
         Label label = new Label(Integer.toString(levelIndex), levelLabelStyle);
         label.setFontScale(2f);
         label.setAlignment(Align.center);
-        button.stack(new Image(new Texture(levelImagePath)), label).expand().fill();
+        LevelSelectButton button = new LevelSelectButton(label, new Image(new Texture(levelImagePath)),
+                                                         buttonLevelSelectStyle);
+        button.setSize(200,200);
         //for star support
         //http://nexsoftware.net/wp/2013/05/09/libgdx-making-a-paged-level-selection-screen/
         button.setName(Integer.toString(levelIndex));
