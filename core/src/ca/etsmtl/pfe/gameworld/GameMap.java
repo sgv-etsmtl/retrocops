@@ -24,6 +24,11 @@ public class GameMap {
     private float mapPixelWidth;
     private float maptilePixelHeigth;
     private float mapTilePixelWidth;
+
+    public MapGraph getMapGraph() {
+        return mapGraph;
+    }
+
     private MapGraph mapGraph;
     private MapGraphGenerator mapGraphGenerator;
     private int numberOfTileWidth;

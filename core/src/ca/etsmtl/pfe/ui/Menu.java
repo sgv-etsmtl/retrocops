@@ -53,6 +53,7 @@ public class Menu {
             public void changed(ChangeEvent event, Actor actor) {
                Gdx.app.log("info", "event :  " + event.getTarget());
                Gdx.app.log("info", "Actor :  " + actor);
+
            }
         };
 

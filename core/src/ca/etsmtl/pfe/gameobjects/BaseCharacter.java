@@ -24,6 +24,8 @@ public abstract class BaseCharacter {
     private Vector2 velocity;
     private float speed;
     private int waypoint = 0;
+    private final int ACTION_POINTS_LIMIT = 2;
+    private int currentActionPoints = 0;
     /* FIN DU CODE EMPRUNTÉ */
 
     private boolean isAlive;
