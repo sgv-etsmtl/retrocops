@@ -25,6 +25,7 @@ public class MapGraph extends DefaultIndexedGraph<Node> {
         return nodes.get((int)(mapWidth * tileY + tileX));
     }
     /* FIN DU CODE EMPRUNTÉ */
+
     public void blockCell(float tileX, float tileY,float mapWidth) {
         Node nodeToBlock = getNodeByTileXY(tileX, tileY, mapWidth);
 

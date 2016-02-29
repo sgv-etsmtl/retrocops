@@ -17,14 +17,16 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 */
 public class AssetLoader {
 
-    public static TextureAtlas textureAtlasButton;
+    public static TextureAtlas textureAtlasButton,textureAtlasSwithcCharacterButton;
     public static BitmapFont gameFont, whiteFont;
-    public static Skin skinButton;
+    public static Skin skinButton,skinSwitchCharacter;
     public static Texture testSprite;
 
     public static void load() {
         textureAtlasButton = new TextureAtlas(Gdx.files.internal("ui/button.pack"));
+        textureAtlasSwithcCharacterButton = new TextureAtlas(Gdx.files.internal("ui/switchCharacter.pack"));
         skinButton = new Skin(textureAtlasButton);
+        skinSwitchCharacter = new Skin(textureAtlasSwithcCharacterButton);
         gameFont = new BitmapFont(Gdx.files.internal("font/font.fnt"));
         gameFont.getData().setScale(2);
         whiteFont = new BitmapFont(Gdx.files.internal("font/white.fnt"));
@@ -35,7 +37,9 @@ public class AssetLoader {
     public static void dispose() {
         gameFont.dispose();
         textureAtlasButton.dispose();
+        textureAtlasSwithcCharacterButton.dispose();
         skinButton.dispose();
+        skinSwitchCharacter.dispose();
         whiteFont.dispose();
         testSprite.dispose();
     }

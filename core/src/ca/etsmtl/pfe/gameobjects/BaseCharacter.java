@@ -24,6 +24,8 @@ public abstract class BaseCharacter {
     private Vector2 velocity;
     private float speed;
     private int waypoint = 0;
+    private final int ACTION_POINTS_LIMIT = 2;
+    private int currentActionPoints = 0;
     /* FIN DU CODE EMPRUNTÉ */
 
     private boolean isAlive;
@@ -32,6 +34,8 @@ public abstract class BaseCharacter {
     private DefaultGraphPath<Node> pathToWalk;
 
     private Node nextPosition;
+
+    BaseCharacterStat stat;
 
     public BaseCharacter(){
        initializeVariable();
@@ -48,6 +52,7 @@ public abstract class BaseCharacter {
         velocity = new Vector2(0,0);
         isAlive = true;
         speed = 900;
+        stat = BaseCharacterStat.waiting;
     }
 
     public Vector2 getPosition() {
@@ -57,7 +62,9 @@ public abstract class BaseCharacter {
     public void setPosition(float positionX, float positionY) {
         this.position.x = positionX;
         this.position.y = positionY;
-        spriteCharacter.setPosition(positionX,positionY);
+        if(spriteCharacter != null) {
+            spriteCharacter.setPosition(positionX, positionY);
+        }
     }
 
     public Vector2 getVelocity() {
@@ -83,6 +90,7 @@ public abstract class BaseCharacter {
 
     public void setCharacterSprite(Sprite spriteCharacter) {
         this.spriteCharacter = spriteCharacter;
+        this.spriteCharacter.setPosition(position.x, position.y);
     }
 
     public void setPathToWalk(DefaultGraphPath<Node> pathToWalk) {
@@ -97,6 +105,7 @@ public abstract class BaseCharacter {
                 this.waypoint = 0;
             }
         }
+        stat = BaseCharacterStat.moving;
     }
 
     public float getSpeed() {
@@ -105,6 +114,10 @@ public abstract class BaseCharacter {
 
     public void setSpeed(float speed) {
         this.speed = speed;
+    }
+
+    public BaseCharacterStat getStat() {
+        return stat;
     }
 
     public void draw(SpriteBatch batch){
@@ -123,7 +136,7 @@ public abstract class BaseCharacter {
       Je l'ai modifier pour utiliser une liste de noeud (fait par le path finding) au lieu du liste de vecteur
     */
     public void update(float delta){
-        if(pathToWalk != null) {
+        if(pathToWalk != null && stat == BaseCharacterStat.moving) {
             nextPosition = pathToWalk.get(waypoint);
             float distanceY = nextPosition.getTilePixelY() - position.y;
             float distanceX = nextPosition.getTilePixelX() - position.x;
@@ -137,6 +150,9 @@ public abstract class BaseCharacter {
                     setPosition(nextPosition.getTilePixelX(), nextPosition.getTilePixelY());
                     if (waypoint + 1 < pathToWalk.getCount()) {
                         waypoint++;
+                    }
+                    else{
+                        stat = BaseCharacterStat.waiting;
                     }
                 }
             }
@@ -197,7 +213,26 @@ public abstract class BaseCharacter {
                 !(velocity != null ? !velocity.equals(that.velocity) : that.velocity != null) &&
                 !(spriteCharacter != null ? !spriteCharacter.equals(that.spriteCharacter) : that.spriteCharacter != null)
                 && !(pathToWalk != null ? !pathToWalk.equals(that.pathToWalk) : that.pathToWalk != null)
-                && !(nextPosition != null ? !nextPosition.equals(that.nextPosition) : that.nextPosition != null);
+                && !(nextPosition != null ? !nextPosition.equals(that.nextPosition) : that.nextPosition != null) &&
+                stat == that.stat;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = position != null ? position.hashCode() : 0;
+        result = 31 * result + (velocity != null ? velocity.hashCode() : 0);
+        result = 31 * result + (speed != +0.0f ? Float.floatToIntBits(speed) : 0);
+        result = 31 * result + waypoint;
+        result = 31 * result + (isAlive ? 1 : 0);
+        result = 31 * result + (spriteCharacter != null ? spriteCharacter.hashCode() : 0);
+        result = 31 * result + (pathToWalk != null ? pathToWalk.hashCode() : 0);
+        result = 31 * result + (nextPosition != null ? nextPosition.hashCode() : 0);
+        result = 31 * result + (stat != null ? stat.hashCode() : 0);
+        return result;
+    }
+
+    public enum BaseCharacterStat{
+        moving,waiting
     }
 
 }

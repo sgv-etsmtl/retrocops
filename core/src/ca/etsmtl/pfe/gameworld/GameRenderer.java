@@ -34,7 +34,7 @@ public class GameRenderer {
 
     private ShapeRenderer shapeRenderer;
     private Vector3 ajustedCamPos;
-    private Vector2 lastScreenPositionClik;
+    private Vector2 lastScreenPositionClick;
 
     private Array<BaseCharacter> characterToDraw;
 
@@ -50,7 +50,7 @@ public class GameRenderer {
         batcher.setProjectionMatrix(cam.combined);
         worldPosition = new Vector3(0,0,0);
         ajustedCamPos = new Vector3(0,0,0);
-        lastScreenPositionClik = new Vector2(0,0);
+        lastScreenPositionClick = new Vector2(0,0);
         calculateBoundary();
         writeFont = AssetLoader.whiteFont;
         characterToDraw = new Array<BaseCharacter>();
@@ -82,53 +82,43 @@ public class GameRenderer {
         characterToDraw.removeIndex(index);
     }
 
+    public void deleteAllCharacterToDraw(){
+        characterToDraw.clear();
+    }
+
     public void render(float delta){
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         cam.update();
-        shapeRenderer.setProjectionMatrix(cam.combined);
         currentMap.render(cam);
 
         drawCharacter(true);
 
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-
-        shapeRenderer.setColor(0, 1.0f, 0, 1);
-        shapeRenderer.rect(cam.position.x, cam.position.y, 100 * cam.zoom, 100 * cam.zoom);
-
-        shapeRenderer.end();
-
         menu.drawMenu();
 
-        drawDebugInfo(true);
+        drawDebugInfo();
 
 
     }
 
-    private void drawDebugInfo(boolean drawDebug){
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-
-        shapeRenderer.setColor(0, 1.0f, 0, 1);
-        shapeRenderer.rect(cam.position.x, cam.position.y, 100 * cam.zoom, 100 * cam.zoom);
-
-        shapeRenderer.end();
+    private void drawDebugInfo(){
 
         //draw last clicked cell
         batcher.begin();
 
         //in the menu
-        if(menu.isMenuClicked(lastScreenPositionClik.x,lastScreenPositionClik.y)) {
-            writeFont.draw(batcher, "Click in menu", 1200, 1050);
+        if(menu.isMenuClicked(lastScreenPositionClick.x, lastScreenPositionClick.y)) {
+            writeFont.draw(batcher, "Click in menu", 1200, 100);
         }
         else {
             int cellX = (int) (worldPosition.x / 160);
             int cellY = (int) (worldPosition.y / 160);
 
-            writeFont.draw(batcher, "Cell click[" + cellX + "," + cellY + "]", 1200, 1050);
+            writeFont.draw(batcher, "Cell click[" + cellX + "," + cellY + "]", 1200, 100);
         }
-        writeFont.draw(batcher, "pos cam " + cam.position.x + ", " + cam.position.y, 1200, 800);
-        writeFont.draw(batcher, "world click " + worldPosition.x + ", " + worldPosition.y, 1200, 600);
+        writeFont.draw(batcher, "pos cam " + cam.position.x + ", " + cam.position.y, 1200, 250);
+        writeFont.draw(batcher, "world click " + worldPosition.x + ", " + worldPosition.y, 1200, 400);
         batcher.end();
     }
 
@@ -140,6 +130,7 @@ public class GameRenderer {
         }
         characterBatcher.end();
         if(drawDebug){
+            shapeRenderer.setProjectionMatrix(cam.combined);
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
             for(BaseCharacter character : characterToDraw){
                 character.drawPathDebug(shapeRenderer);
@@ -160,14 +151,15 @@ public class GameRenderer {
         }
         if(x != 0 || y != 0){
             cam.translate(x, y);
+            cam.update();
         }
 
     }
 
     public Vector3 transformScreenLocationToWorldLocation(float x, float y){
         Vector3 position = new Vector3();
-        lastScreenPositionClik.x = x;
-        lastScreenPositionClik.y = y;
+        lastScreenPositionClick.x = x;
+        lastScreenPositionClick.y = y;
         worldPosition.x = x;
         worldPosition.y = y;
         cam.unproject(worldPosition);
@@ -180,11 +172,15 @@ public class GameRenderer {
         cameraViewWidth = cam.viewportWidth * newZoom;
         cam.zoom = newZoom;
         calculateBoundary();
-        ajusttCameraAfterZoom();
+        ajusttCameraAfterZoomOrLookAt();
     }
 
     public float getCameraZoom(){
         return cam.zoom;
+    }
+
+    public void recalculateBoundary(){
+        calculateBoundary();
     }
 
     private void calculateBoundary(){
@@ -195,7 +191,7 @@ public class GameRenderer {
         upperboundary = currentMap.getMapPixelHeigth() - (cameraViewHeight / 2);
     }
 
-    private void ajusttCameraAfterZoom(){
+    private void ajusttCameraAfterZoomOrLookAt(){
         ajustedCamPos.x = cam.position.x;
         ajustedCamPos.y = cam.position.y;
         ajustedCamPos.z = 0;
@@ -223,7 +219,21 @@ public class GameRenderer {
         batcher.dispose();
         characterBatcher.dispose();
         shapeRenderer.dispose();
+    }
 
+    public void lookAtPlayer(float playerPosX, float playerPosY){
+        cam.position.set(playerPosX, playerPosY, 0);
+        ajusttCameraAfterZoomOrLookAt();
+        cam.update();
+    }
+
+    public void lookAtPlayer(Vector2 positionPlayer){
+        lookAtPlayer(positionPlayer.x, positionPlayer.y);
+    }
+
+    public void resetCamera(){
+        cam.position.set(cameraViewWidth / 2, cameraViewHeight / 2,0);
+        setCameraZoom(1);
     }
 
 }
