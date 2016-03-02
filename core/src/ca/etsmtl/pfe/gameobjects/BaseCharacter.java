@@ -1,5 +1,6 @@
 package ca.etsmtl.pfe.gameobjects;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.pfa.DefaultGraphPath;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -20,22 +21,28 @@ public abstract class BaseCharacter {
       et isWaypointReached qui sont aussi pris tiré du même site web
     */
 
-    private Vector2 position;
-    private Vector2 velocity;
-    private float speed;
-    private int waypoint = 0;
-    private final int ACTION_POINTS_LIMIT = 2;
-    private int currentActionPoints = 0;
+    protected Vector2 position;
+    protected Vector2 velocity;
+    protected float speed;
+    protected int waypoint = 0;
+    protected boolean isDone;
+
+    public int getACTION_POINTS_LIMIT() {
+        return ACTION_POINTS_LIMIT;
+    }
+
+    protected final int ACTION_POINTS_LIMIT = 2;
+    protected int currentActionPoints = 0;
     /* FIN DU CODE EMPRUNTÉ */
 
-    private boolean isAlive;
+    protected boolean isAlive;
     Sprite spriteCharacter;
 
-    private DefaultGraphPath<Node> pathToWalk;
+    protected DefaultGraphPath<Node> pathToWalk;
 
-    private Node nextPosition;
+    protected Node nextPosition;
 
-    BaseCharacterStat stat;
+    protected BaseCharacterState baseCharacterState;
 
     public BaseCharacter(){
        initializeVariable();
@@ -52,7 +59,7 @@ public abstract class BaseCharacter {
         velocity = new Vector2(0,0);
         isAlive = true;
         speed = 900;
-        stat = BaseCharacterStat.waiting;
+        baseCharacterState = BaseCharacterState.waiting;
     }
 
     public Vector2 getPosition() {
@@ -105,7 +112,7 @@ public abstract class BaseCharacter {
                 this.waypoint = 0;
             }
         }
-        stat = BaseCharacterStat.moving;
+        baseCharacterState = BaseCharacterState.moving;
     }
 
     public float getSpeed() {
@@ -116,8 +123,8 @@ public abstract class BaseCharacter {
         this.speed = speed;
     }
 
-    public BaseCharacterStat getStat() {
-        return stat;
+    public BaseCharacterState getBaseCharacterState() {
+        return baseCharacterState;
     }
 
     public void draw(SpriteBatch batch){
@@ -136,7 +143,7 @@ public abstract class BaseCharacter {
       Je l'ai modifier pour utiliser une liste de noeud (fait par le path finding) au lieu du liste de vecteur
     */
     public void update(float delta){
-        if(pathToWalk != null && stat == BaseCharacterStat.moving) {
+        if(pathToWalk != null && baseCharacterState == BaseCharacterState.moving) {
             nextPosition = pathToWalk.get(waypoint);
             float distanceY = nextPosition.getTilePixelY() - position.y;
             float distanceX = nextPosition.getTilePixelX() - position.x;
@@ -152,10 +159,15 @@ public abstract class BaseCharacter {
                         waypoint++;
                     }
                     else{
-                        stat = BaseCharacterStat.waiting;
+                        baseCharacterState = BaseCharacterState.waiting;
+                        this.currentActionPoints--;
                     }
                 }
             }
+        }
+
+        if(this.getCurrentActionPoints() <= 0) {
+            this.setIsDone(true);
         }
     }
     /* FIN DU CODE EMPRUNTÉ */
@@ -195,9 +207,6 @@ public abstract class BaseCharacter {
                 shapeRenderer.circle(node.getTilePixelX(), node.getTilePixelY(), 10, 10);
                 previous = node;
             }
-            shapeRenderer.setColor(Color.BLACK);
-            shapeRenderer.line(position.x, position.y,
-                    nextPosition.getTilePixelX(), nextPosition.getTilePixelY());
         }
     }
     /* FIN DU CODE EMPRUNTÉ */
@@ -214,7 +223,7 @@ public abstract class BaseCharacter {
                 !(spriteCharacter != null ? !spriteCharacter.equals(that.spriteCharacter) : that.spriteCharacter != null)
                 && !(pathToWalk != null ? !pathToWalk.equals(that.pathToWalk) : that.pathToWalk != null)
                 && !(nextPosition != null ? !nextPosition.equals(that.nextPosition) : that.nextPosition != null) &&
-                stat == that.stat;
+                baseCharacterState == that.baseCharacterState;
     }
 
     @Override
@@ -227,12 +236,38 @@ public abstract class BaseCharacter {
         result = 31 * result + (spriteCharacter != null ? spriteCharacter.hashCode() : 0);
         result = 31 * result + (pathToWalk != null ? pathToWalk.hashCode() : 0);
         result = 31 * result + (nextPosition != null ? nextPosition.hashCode() : 0);
-        result = 31 * result + (stat != null ? stat.hashCode() : 0);
+        result = 31 * result + (baseCharacterState != null ? baseCharacterState.hashCode() : 0);
         return result;
     }
 
-    public enum BaseCharacterStat{
-        moving,waiting
+    public int getCurrentActionPoints() {
+        return currentActionPoints;
+    }
+
+    public void setBaseCharacterState(BaseCharacterState baseCharacterState) {
+        this.baseCharacterState = baseCharacterState;
+    }
+
+    public void setCurrentActionPoints(int currentActionPoints) {
+        this.currentActionPoints = currentActionPoints;
+    }
+
+    public void setIsDone(boolean isDone) {
+        this.isDone = isDone;
+    }
+
+    public boolean isDone() {
+        return this.isDone;
+    }
+
+    public void useOverwatch() {
+        this.baseCharacterState = baseCharacterState.overwatch;
+        setCurrentActionPoints(0);
+        Gdx.app.log("info", this + "has used overwatch");
+    }
+
+    public enum BaseCharacterState {
+        moving,waiting,overwatch
     }
 
 }

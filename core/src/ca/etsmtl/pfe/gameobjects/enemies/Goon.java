@@ -23,7 +23,6 @@ public class Goon extends BaseCharacter{
     private StateMachine<Goon, GoonState> stateMachine;
     private GameWorld gameWorld;
     private boolean enemyInSight;
-    private boolean isDone;
     private int nbIdleTurns;
     private ArrayList<BaseCharacter> targetList;
     private ArrayList<Vector2> lastKnownEnemyPosition;
@@ -34,23 +33,33 @@ public class Goon extends BaseCharacter{
         setCharacterSprite(new Sprite(AssetLoader.testSprite, 0, 160, 160, 160));
 
         this.nbIdleTurns = 0;
+        this.currentActionPoints = ACTION_POINTS_LIMIT;
         this.enemyInSight = false;
         this.isDone = false;
         this.targetList = new ArrayList<BaseCharacter>();
         this.lastKnownEnemyPosition = new ArrayList<Vector2>();
         this.gameWorld = gameWorld;
-        setPosition(positionX*160, positionY*160);
+        setPosition(positionX * 160, positionY * 160);
     }
 
     @Override
     public void update(float delta) {
-        this.isDone = false;
-        stateMachine.update();
+
+        if(!this.isDone) {
+            stateMachine.update();
+            super.update(delta);
+
+            if(this.currentActionPoints == 0) {
+                this.setIsDone(true);
+            }
+        }
     }
 
     public void patrol(){
         int nbOfNeighbours = 0;
-        Node currentNode = gameWorld.getGameMap().getMapGraph().getNodeByTileXY(this.getPosition().x, this.getPosition().y + 1, this.gameWorld.getGameMap().getMapPixelWidth());
+        Node currentNode = gameWorld.getGameMap().getMapGraph().getNodeByTileXY(this.getPosition().x / gameWorld.DEFAULT_TILE_SIZE,
+                                                                                this.getPosition().y / gameWorld.DEFAULT_TILE_SIZE,
+                                                                                this.gameWorld.getGameMap().getNumberOfTileWidth());
         nbOfNeighbours = currentNode.getConnections().size;
 
         if (nbOfNeighbours > 0) {
@@ -58,6 +67,7 @@ public class Goon extends BaseCharacter{
             Node targetNode = currentNode.getConnections().get(i).getToNode();
 
             gameWorld.changeCharacterTilePosition(currentNode, targetNode, this);
+
             Gdx.app.log("info", "PATROL from x: " + currentNode.getTileX() + " | y: " + currentNode.getTileY());
             Gdx.app.log("info", "PATROL to x: " + targetNode.getTileX() + " | y: " + targetNode.getTileY());
         }
@@ -72,7 +82,9 @@ public class Goon extends BaseCharacter{
             @Override
             public void update(Goon goon) {
 
-                goon.patrol();
+                if(goon.baseCharacterState == BaseCharacterState.waiting) {
+                    goon.patrol();
+                }
 
                 if (goon.enemyInSight) {
                     goon.stateMachine.changeState(ALERT);
