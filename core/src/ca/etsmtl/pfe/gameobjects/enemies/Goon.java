@@ -46,10 +46,11 @@ public class Goon extends BaseCharacter{
     public void update(float delta) {
 
         if(!this.isDone) {
-            stateMachine.update();
-            super.update(delta);
-
-            if(this.currentActionPoints == 0) {
+            if (this.getCurrentActionPoints() >= 0) {
+                stateMachine.update();
+                super.update(delta);
+            }
+            if (this.currentActionPoints == 0) {
                 this.setIsDone(true);
             }
         }
@@ -68,8 +69,8 @@ public class Goon extends BaseCharacter{
 
             gameWorld.changeCharacterTilePosition(currentNode, targetNode, this);
 
-            Gdx.app.log("info", "PATROL from x: " + currentNode.getTileX() + " | y: " + currentNode.getTileY());
-            Gdx.app.log("info", "PATROL to x: " + targetNode.getTileX() + " | y: " + targetNode.getTileY());
+        //    Gdx.app.log("info", "PATROL from x: " + currentNode.getTileX() + " | y: " + currentNode.getTileY());
+        //    Gdx.app.log("info", "PATROL to x: " + targetNode.getTileX() + " | y: " + targetNode.getTileY());
         }
     }
 

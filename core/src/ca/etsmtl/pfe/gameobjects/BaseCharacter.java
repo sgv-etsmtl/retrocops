@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.compression.lzma.Base;
 
 import ca.etsmtl.pfe.pathfinding.Node;
 
@@ -164,6 +165,9 @@ public abstract class BaseCharacter {
                     }
                 }
             }
+        } else if (this.getBaseCharacterState() == BaseCharacterState.overwatch) {
+            useOverwatch();
+            this.baseCharacterState = BaseCharacterState.waiting;
         }
 
         if(this.getCurrentActionPoints() <= 0) {

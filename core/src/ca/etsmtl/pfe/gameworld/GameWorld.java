@@ -56,12 +56,16 @@ public class GameWorld {
             }
 
 
-            if(selectedCharacter != null) {
-                selectedCharacter.update(delta);
-                if (selectedCharacter.getBaseCharacterState() == BaseCharacter.BaseCharacterState.moving) {
-                    gameRenderer.lookAtPlayer(selectedCharacter.getPosition());
+            nbOfDonePlayers = 0;
+            for(PlayerCharacter pc : this.playerCharacters) {
+
+                pc.update(delta);
+
+                if (pc.getBaseCharacterState() == BaseCharacter.BaseCharacterState.moving) {
+                    gameRenderer.lookAtPlayer(pc.getPosition());
                 }
-                if(selectedCharacter.isDone()) {
+
+                if(pc.isDone() && pc.equals(selectedCharacter)) {
                     nbOfDonePlayers++;
                     changeSelectedCharacter();
                 }
@@ -78,13 +82,10 @@ public class GameWorld {
                 initEnemyTurn();
             }
 
+            nbOfDoneEnemies = 0;
             for (BaseCharacter enemy : ennemies) {
-                Gdx.app.log("info", "AI" + enemy + " has " + enemy.getCurrentActionPoints() + "AP starting it's turn");
-                if(enemy.getCurrentActionPoints() >= 0) {
-                    enemy.update(delta);
-                    Gdx.app.log("info", "AI" + enemy + " has " + enemy.getCurrentActionPoints() + "AP after updating");
 
-                }
+                enemy.update(delta);
 
                 if(enemy.isDone()) {
                     this.nbOfDoneEnemies++;
