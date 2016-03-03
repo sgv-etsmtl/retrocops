@@ -53,24 +53,25 @@ public class Menu {
         ImageButton.ImageButtonStyle switchCharacterStyle = new ImageButton.ImageButtonStyle();
         switchCharacterStyle.imageUp = AssetLoader.skinSwitchCharacter.getDrawable("switchCharacter.up");
         switchCharacterStyle.imageDown = AssetLoader.skinSwitchCharacter.getDrawable("switchCharacter.down");
+
+
+
         switchButton = new ImageButton(switchCharacterStyle);
+        itemButton = new TextButton("Item", testButtonStyle);
+        useButton = new TextButton("USE", testButtonStyle);
+        overwatchButton = new TextButton("OW", testButtonStyle);
+        optionsButton = new TextButton("Options", testButtonStyle);
 
         menuClickListenerHandler = new MenuClickListenerHandler(switchButton,itemButton,useButton,
-                                                                overwatchButton,optionsButton, gameWorld);
+                overwatchButton,optionsButton, gameWorld);
 
         switchButton.addListener(menuClickListenerHandler);
-
-        itemButton = new TextButton("Item", testButtonStyle);
         itemButton.addListener(menuClickListenerHandler);
-
-        useButton = new TextButton("USE", testButtonStyle);
         useButton.addListener(menuClickListenerHandler);
-        
-        overwatchButton = new TextButton("OW", testButtonStyle);
         overwatchButton.addListener(menuClickListenerHandler);
-
-        optionsButton = new TextButton("Options", testButtonStyle);
         optionsButton.addListener(menuClickListenerHandler);
+
+
 
 
         verticalTable = new Table();

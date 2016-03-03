@@ -2,22 +2,13 @@ package ca.etsmtl.pfe.gameworld;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.pfa.DefaultGraphPath;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
-import ca.etsmtl.pfe.gameloader.gameobjectinfo.GoonInfo;
-import ca.etsmtl.pfe.gameloader.gameobjectinfo.PlayerInfo;
-import ca.etsmtl.pfe.gameloader.mapinfo.GameLevelInfo;
-import ca.etsmtl.pfe.gameloader.mapinfo.LevelInfo;
 import ca.etsmtl.pfe.gameobjects.BaseCharacter;
 import ca.etsmtl.pfe.gameobjects.PlayerCharacter;
-import ca.etsmtl.pfe.gameobjects.enemies.Goon;
-import ca.etsmtl.pfe.helper.AssetLoader;
 import ca.etsmtl.pfe.helper.LevelLoader;
 import ca.etsmtl.pfe.pathfinding.Node;
 import ca.etsmtl.pfe.ui.gamemenu.Menu;
@@ -29,19 +20,27 @@ public class GameWorld {
     private Menu menu;
     private ArrayList<BaseCharacter> ennemies;
     private ArrayList<PlayerCharacter> playerCharacters;
-    private boolean playerTurnIsActive;
+    protected boolean changeToPlayerTurnFlag;
+
+    public PlayerCharacter getSelectedCharacter() {
+        return selectedCharacter;
+    }
+
     private PlayerCharacter selectedCharacter;
     private int selectedCharacterIndex;
     public final int DEFAULT_TILE_SIZE = 160;
+    public boolean turnNeedsInit = true;
+    private int nbOfDonePlayers, nbOfDoneEnemies;
     
     public GameWorld(GameRenderer gameRenderer,Menu menu){
         this.gameRenderer = gameRenderer;
         this.menu = menu;
-        this.playerTurnIsActive = true;
+        this.changeToPlayerTurnFlag = false;
         gameMap = new GameMap();
         gameRenderer.setCurrentMap(gameMap);
         ennemies = new ArrayList<BaseCharacter>();
         playerCharacters = new ArrayList<PlayerCharacter>(2);
+        this.nbOfDonePlayers = 0;
 
         //this is for debug
         LevelLoader.loadLever(this, 0);
@@ -50,21 +49,53 @@ public class GameWorld {
 
     public void update(float delta){
 
-        if(playerTurnIsActive) {
+        if(changeToPlayerTurnFlag) {
 
-            if(selectedCharacter != null) {
-                selectedCharacter.update(delta);
-                if (selectedCharacter.getStat() == BaseCharacter.BaseCharacterStat.moving) {
-                    gameRenderer.lookAtPlayer(selectedCharacter.getPosition());
+            if(turnNeedsInit) {
+                initPlayerTurn();
+            }
+
+
+            nbOfDonePlayers = 0;
+            for(PlayerCharacter pc : this.playerCharacters) {
+
+                pc.update(delta);
+
+                if (pc.getBaseCharacterState() == BaseCharacter.BaseCharacterState.moving) {
+                    gameRenderer.lookAtPlayer(pc.getPosition());
+                }
+
+                if(pc.isDone() && pc.equals(selectedCharacter)) {
+                    nbOfDonePlayers++;
+                    changeSelectedCharacter();
                 }
             }
+
+            if (nbOfDonePlayers >= playerCharacters.size()) {
+                turnNeedsInit = true;
+                changeToPlayerTurnFlag = false;
+            }
+
         } else {
             //AI
-            Gdx.app.log("info", "AI TURN OMG");
-            for (BaseCharacter enemy : ennemies) {
-                enemy.update(delta);
+            if(turnNeedsInit) {
+                initEnemyTurn();
             }
-            playerTurnIsActive = true;
+
+            nbOfDoneEnemies = 0;
+            for (BaseCharacter enemy : ennemies) {
+
+                enemy.update(delta);
+
+                if(enemy.isDone()) {
+                    this.nbOfDoneEnemies++;
+                }
+            }
+
+            if (this.nbOfDoneEnemies >= ennemies.size()) {
+                changeToPlayerTurnFlag = true;
+                turnNeedsInit = true;
+            }
         }
     }
 
@@ -72,9 +103,32 @@ public class GameWorld {
         gameRenderer.tranlateCamera(x, y);
     }
 
+
+    public void initPlayerTurn() {
+        nbOfDonePlayers = 0;
+        for (PlayerCharacter pc : playerCharacters) {
+            pc.setBaseCharacterState(BaseCharacter.BaseCharacterState.waiting);
+            pc.setCurrentActionPoints(pc.getACTION_POINTS_LIMIT());
+            pc.setIsDone(false);
+        }
+        this.turnNeedsInit = false;
+
+    }
+
+
+    public void initEnemyTurn() {
+        nbOfDoneEnemies = 0;
+        for (BaseCharacter enemy : ennemies) {
+            enemy.setBaseCharacterState(BaseCharacter.BaseCharacterState.waiting);
+            enemy.setCurrentActionPoints(enemy.getACTION_POINTS_LIMIT());
+            enemy.setIsDone(false);
+        }
+        this.turnNeedsInit = false;
+    }
+
     public void changeCharacterPosition(float screenX, float screenY){
         if(!isPositionPixelInMenu(screenX,screenY) && selectedCharacter != null &&
-                selectedCharacter.getStat() == BaseCharacter.BaseCharacterStat.waiting) {
+                selectedCharacter.getBaseCharacterState() == BaseCharacter.BaseCharacterState.waiting) {
             Vector3 end = getWorldPositionFromScreenPosition(screenX, screenY);
             Vector2 start = selectedCharacter.getPosition();
             DefaultGraphPath<Node> path = gameMap.getPath(start.x, start.y, end.x, end.y);
@@ -129,10 +183,10 @@ public class GameWorld {
         gameMap.blockCell(player.getPosition().x, player.getPosition().y);
     }
 
-    public void addEnemy(BaseCharacter ennemie){
-        ennemies.add(ennemie);
-        gameRenderer.addCharacterToDraw(ennemie);
-        gameMap.blockCell(ennemie.getPosition().x, ennemie.getPosition().y);
+    public void addEnemy(BaseCharacter enemy){
+        ennemies.add(enemy);
+        gameRenderer.addCharacterToDraw(enemy);
+        gameMap.blockCell(enemy.getPosition().x, enemy.getPosition().y);
     }
 
     public void clearWorld(){
@@ -152,7 +206,7 @@ public class GameWorld {
 
     public void changeSelectedCharacter(){
         if(playerCharacters != null) {
-            if (selectedCharacter == null || selectedCharacter.getStat() == BaseCharacter.BaseCharacterStat.waiting) {
+            if (selectedCharacter == null || selectedCharacter.getBaseCharacterState() == BaseCharacter.BaseCharacterState.waiting) {
                 selectedCharacterIndex = (selectedCharacterIndex + 1) % playerCharacters.size();
                 selectedCharacter = playerCharacters.get(selectedCharacterIndex);
                 //change camera lookAt

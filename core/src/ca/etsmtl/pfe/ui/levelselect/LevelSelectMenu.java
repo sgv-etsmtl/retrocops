@@ -57,22 +57,21 @@ public class LevelSelectMenu {
     }
 
     private void addLevelInMenu() {
-        int numberOfMenu = gameLevelInfo.getLevelsName().size();
+        int nbOfLevels = gameLevelInfo.getLevelsName().size();
         Table levels = new Table().pad(50);
         levels.defaults().pad(20, 40, 20, 40);
-        int maxDebug = 50;
-        //TODO change condition for normal condition
-        for (int i = 0; i < maxDebug; ++i) {
-            if (i != 0 && i % numberOfLevelByRow == 0) {
+
+        for (int i = 0; i < nbOfLevels; ++i) {
+            levels.add(getLevelButton(i, gameLevelInfo.getPathsLevelImage().get(i))).expand().fill();
+            if (i != 0 && i % (numberOfLevelByRow - 1) == 0) {
                 levels.row();
             }
-            if (i != 0 && i % numberOfRowByPage == 0 || i == maxDebug - 1) {
+            if ((i != 0 && i % (numberOfRowByPage - 1) == 0) || i == nbOfLevels - 1) {
+
                 levelSelectPages.addPage(levels);
                 levels = new Table().pad(50);
                 levels.defaults().pad(20, 40, 20, 40);
             }
-            levels.add(getLevelButton(i, gameLevelInfo.getPathsLevelImage().get(
-                    i % gameLevelInfo.getPathsLevelImage().size()))).expand().fill();
         }
     }
 
