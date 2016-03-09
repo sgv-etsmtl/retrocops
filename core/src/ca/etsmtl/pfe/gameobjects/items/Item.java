@@ -68,14 +68,16 @@ public abstract class Item {
         this.currentClipAmmo = currentClipAmmo;
     }
 
-    public abstract void attack(BaseCharacter characterToAttack);
+    public abstract boolean attack(BaseCharacter characterToAttack);
 
-    public abstract void attackTile(Node tileToAttack);
+    public abstract boolean attackTile(Node tileToAttack);
 
-    public void reload(){
+    public boolean reload(){
         if(isReloadable && currentClipAmmo < maxAmmoByClip){
             totalAmmo -= maxAmmoByClip - currentClipAmmo;
             currentClipAmmo = maxAmmoByClip;
+            return true;
         }
+        return false;
     }
 }

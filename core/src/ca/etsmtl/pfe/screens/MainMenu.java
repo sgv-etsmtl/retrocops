@@ -80,7 +80,6 @@ public class MainMenu implements Screen{
         table.add(gameName);
         table.row();
         table.add(startButton).width(600).height(100);
-        table.debug();
 
         stage.addActor(table);
         Gdx.input.setInputProcessor(stage);

@@ -78,6 +78,7 @@ public abstract class BaseCharacter {
         baseCharacterState = BaseCharacterState.waiting;
         currentLivePoint = 3;
         itemCharacter = new Pistole(50,10,20);
+        itemCharacter.setOwner(this);
         colorOfHighlightForSelected = new Color(0,1,0,0.5f);
         colorOfHighlightForAttack = new Color(1,0,0,0.5f);
     }
@@ -161,6 +162,9 @@ public abstract class BaseCharacter {
 
     public void setItemCharacter(Item itemCharacter) {
         this.itemCharacter = itemCharacter;
+        if(itemCharacter != null){
+            this.itemCharacter.setOwner(this);
+        }
     }
 
     public void draw(SpriteBatch batch){
@@ -270,7 +274,7 @@ public abstract class BaseCharacter {
             }
         }
     }
-    /* FIN DU CODE EMPRUNTÉ */
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -279,12 +283,19 @@ public abstract class BaseCharacter {
         BaseCharacter that = (BaseCharacter) o;
 
         return Float.compare(that.speed, speed)==0 && isAlive==that.isAlive && waypoint==that.waypoint
+                && isDone == that.isDone && currentActionPoints == that.currentActionPoints
+                && currentLivePoint == that.currentLivePoint && isHighlight == that.isHighlight
+                && isHighlightForAttack == that.isHighlightForAttack
+                && !(itemCharacter != null ? !itemCharacter.equals(that.itemCharacter) : that.itemCharacter != null)
                 && !(position != null ? !position.equals(that.position) : that.position != null) &&
                 !(velocity != null ? !velocity.equals(that.velocity) : that.velocity != null) &&
                 !(spriteCharacter != null ? !spriteCharacter.equals(that.spriteCharacter) : that.spriteCharacter != null)
                 && !(pathToWalk != null ? !pathToWalk.equals(that.pathToWalk) : that.pathToWalk != null)
-                && !(nextPosition != null ? !nextPosition.equals(that.nextPosition) : that.nextPosition != null) &&
-                baseCharacterState == that.baseCharacterState;
+                && !(nextPosition != null ? !nextPosition.equals(that.nextPosition) : that.nextPosition != null)
+                && ! (colorOfHighlightForSelected != null ? !colorOfHighlightForSelected.equals(that.colorOfHighlightForSelected) : that.colorOfHighlightForSelected != null)
+                && !(colorOfHighlightForAttack != null ? !colorOfHighlightForAttack.equals(that.colorOfHighlightForAttack) : that.colorOfHighlightForAttack != null)
+                && baseCharacterState == that.baseCharacterState
+                && !(tagetPossibleList != null ? !tagetPossibleList.equals(that.tagetPossibleList) : that.tagetPossibleList != null);
     }
 
     @Override
@@ -293,11 +304,21 @@ public abstract class BaseCharacter {
         result = 31 * result + (velocity != null ? velocity.hashCode() : 0);
         result = 31 * result + (speed != +0.0f ? Float.floatToIntBits(speed) : 0);
         result = 31 * result + waypoint;
+        result = 31 * result + (isDone ? 1 : 0);
+        result = 31 * result + (itemCharacter != null ? itemCharacter.hashCode() : 0);
+        result = 31 * result + ACTION_POINTS_LIMIT;
+        result = 31 * result + currentActionPoints;
         result = 31 * result + (isAlive ? 1 : 0);
         result = 31 * result + (spriteCharacter != null ? spriteCharacter.hashCode() : 0);
         result = 31 * result + (pathToWalk != null ? pathToWalk.hashCode() : 0);
         result = 31 * result + (nextPosition != null ? nextPosition.hashCode() : 0);
         result = 31 * result + (baseCharacterState != null ? baseCharacterState.hashCode() : 0);
+        result = 31 * result + currentLivePoint;
+        result = 31 * result + (isHighlight ? 1 : 0);
+        result = 31 * result + (isHighlightForAttack ? 1 : 0);
+        result = 31 * result + (colorOfHighlightForSelected != null ? colorOfHighlightForSelected.hashCode() : 0);
+        result = 31 * result + (colorOfHighlightForAttack != null ? colorOfHighlightForAttack.hashCode() : 0);
+        result = 31 * result + (tagetPossibleList != null ? tagetPossibleList.hashCode() : 0);
         return result;
     }
 
@@ -328,14 +349,25 @@ public abstract class BaseCharacter {
     }
 
     public void characterGetIt(int damagePoint){
-        currentActionPoints -= damagePoint;
-        if (currentActionPoints <= 0){
+        currentLivePoint -= damagePoint;
+        if (currentLivePoint <= 0){
             isAlive = false;
         }
     }
 
     public void attack(BaseCharacter characterToAttack){
+        if(currentActionPoints > 0) {
+            itemCharacter.attack(characterToAttack);
+            this.currentActionPoints--;
+        }
+    }
 
+    public void reloadItem(){
+        if(currentActionPoints > 0 && itemCharacter.isReloadable()){
+            if(itemCharacter.reload()){
+                this.currentActionPoints--;
+            }
+        }
     }
 
     public void highlightSelectedCharacter(){

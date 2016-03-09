@@ -12,12 +12,16 @@ public class Pistole extends Item {
     }
 
     @Override
-    public void attack(BaseCharacter characterToAttack) {
-        characterToAttack.characterGetIt(1);
+    public boolean attack(BaseCharacter characterToAttack) {
+        if(currentClipAmmo > 0) {
+            currentClipAmmo -= 1;
+            characterToAttack.characterGetIt(1);
+        }
+        return true;
     }
 
     @Override
-    public void attackTile(Node tileToAttack) {
+    public boolean attackTile(Node tileToAttack) {
         throw new NotImplementedException();
     }
 }

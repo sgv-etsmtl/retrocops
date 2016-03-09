@@ -4,15 +4,19 @@ package ca.etsmtl.pfe.ui.gamemenu;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.graphics.Camera;
 
+import ca.etsmtl.pfe.gameobjects.items.Item;
 import ca.etsmtl.pfe.gameworld.GameWorld;
 import ca.etsmtl.pfe.helper.AssetLoader;
 
@@ -21,7 +25,8 @@ public class Menu {
 
     private Stage menuStage;
     private ImageButton switchButton;
-    private TextButton itemButton, useButton, overwatchButton, optionsButton;
+    private ItemMenuButton itemButton;
+    private TextButton useButton, overwatchButton, optionsButton;
     private Table verticalTable;
     private ShapeRenderer shapeRenderer;
     private float viewportWidth;
@@ -46,6 +51,8 @@ public class Menu {
         testButtonStyle.pressedOffsetY = -5;
         testButtonStyle.font = AssetLoader.gameFont;
 
+        //new Image(new Texture(levelImagePath))
+
         //placeholder menu buttons
         final int BUTTON_SIZE = 200;
         final int PADDING = 5;
@@ -57,7 +64,8 @@ public class Menu {
 
 
         switchButton = new ImageButton(switchCharacterStyle);
-        itemButton = new TextButton("Item", testButtonStyle);
+        itemButton = new ItemMenuButton("0", "0", "0", new Button.ButtonStyle(),
+                                       AssetLoader.pistolUp, AssetLoader.pistolDown);
         useButton = new TextButton("USE", testButtonStyle);
         overwatchButton = new TextButton("OW", testButtonStyle);
         optionsButton = new TextButton("Options", testButtonStyle);
@@ -136,5 +144,13 @@ public class Menu {
     public void dispose(){
         menuStage.dispose();
         shapeRenderer.dispose();
+    }
+
+    public void resetTextUseButton(){
+        useButton.setText("USE");
+    }
+
+    public void updateItemMenuInfo(Item item){
+        itemButton.updateInfoAmmo(item.getTotalAmmo(), item.getCurrentClipAmmo(), item.getMaxAmmoByClip());
     }
 }
