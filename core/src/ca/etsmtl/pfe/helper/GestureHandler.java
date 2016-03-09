@@ -26,15 +26,13 @@ public class GestureHandler implements GestureDetector.GestureListener {
     public boolean touchDown(float x, float y, int pointer, int button) {
         dragFirstPos.x = x;
         dragFirstPos.y = y;
-        //for debug message click in the menu
-        gameWorld.getWorldPositionFromScreenPosition(x, y);
+        gameWorld.setLastScreenPositionClick(x, y);
         return false;
     }
 
     @Override
     public boolean tap(float x, float y, int count, int button) {
-        gameWorld.getWorldPositionFromScreenPosition(x, y);
-        gameWorld.changeCharacterPosition(x,y);
+        gameWorld.handleTapScreen(x,y);
         return true;
     }
 

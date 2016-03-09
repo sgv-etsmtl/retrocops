@@ -31,6 +31,7 @@ public class GameWorld {
     public final int DEFAULT_TILE_SIZE = 160;
     public boolean turnNeedsInit = true;
     private int nbOfDonePlayers, nbOfDoneEnemies;
+    private GameWorldState gameWorldState;
     
     public GameWorld(GameRenderer gameRenderer,Menu menu){
         this.gameRenderer = gameRenderer;
@@ -41,10 +42,8 @@ public class GameWorld {
         ennemies = new ArrayList<BaseCharacter>();
         playerCharacters = new ArrayList<PlayerCharacter>(2);
         this.nbOfDonePlayers = 0;
-
-        //this is for debug
-        LevelLoader.loadLever(this, 0);
         selectedCharacterIndex = -1;
+        gameWorldState = GameWorldState.MovingPlayer;
     }
 
     public void update(float delta){
@@ -110,6 +109,8 @@ public class GameWorld {
             pc.setBaseCharacterState(BaseCharacter.BaseCharacterState.waiting);
             pc.setCurrentActionPoints(pc.getACTION_POINTS_LIMIT());
             pc.setIsDone(false);
+            //for debug
+            pc.setTagetPossibleList(ennemies);
         }
         this.turnNeedsInit = false;
 
@@ -126,7 +127,23 @@ public class GameWorld {
         this.turnNeedsInit = false;
     }
 
-    public void changeCharacterPosition(float screenX, float screenY){
+    public void handleTapScreen(float screenX, float screenY){
+        switch (gameWorldState){
+            case MovingPlayer:
+                changeCharacterPosition(screenX, screenY);
+                break;
+            case usingItem:
+                useItem(screenX, screenY);
+                break;
+        }
+    }
+
+    public void setLastScreenPositionClick(float screenX, float screenY){
+        //for debug info
+        gameRenderer.setLastScreenPositionClick(screenX, screenY);
+    }
+
+    private void changeCharacterPosition(float screenX, float screenY){
         if(!isPositionPixelInMenu(screenX,screenY) && selectedCharacter != null &&
                 selectedCharacter.getBaseCharacterState() == BaseCharacter.BaseCharacterState.waiting) {
             Vector3 end = getWorldPositionFromScreenPosition(screenX, screenY);
@@ -142,6 +159,10 @@ public class GameWorld {
                 }
             }
         }
+    }
+
+    private void useItem(float screenX, float screenY){
+
     }
 
     public void changeCharacterTilePosition(Node fromNode, Node toNode, BaseCharacter baseCharacter){
@@ -207,12 +228,20 @@ public class GameWorld {
     public void changeSelectedCharacter(){
         if(playerCharacters != null) {
             if (selectedCharacter == null || selectedCharacter.getBaseCharacterState() == BaseCharacter.BaseCharacterState.waiting) {
+                if(selectedCharacter != null) {
+                    selectedCharacter.unHighlightCharacter();
+                }
                 selectedCharacterIndex = (selectedCharacterIndex + 1) % playerCharacters.size();
                 selectedCharacter = playerCharacters.get(selectedCharacterIndex);
                 //change camera lookAt
                 gameRenderer.lookAtPlayer(selectedCharacter.getPosition());
+                selectedCharacter.highlightSelectedCharacter();
             }
         }
+    }
+
+    public enum GameWorldState {
+        usingItem,MovingPlayer
     }
 
 }

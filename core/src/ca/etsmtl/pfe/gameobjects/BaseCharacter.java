@@ -7,8 +7,11 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.compression.lzma.Base;
 
+import java.util.List;
+
+import ca.etsmtl.pfe.gameobjects.items.Item;
+import ca.etsmtl.pfe.gameobjects.items.Pistole;
 import ca.etsmtl.pfe.pathfinding.Node;
 
 public abstract class BaseCharacter {
@@ -27,6 +30,7 @@ public abstract class BaseCharacter {
     protected float speed;
     protected int waypoint = 0;
     protected boolean isDone;
+    protected Item itemCharacter;
 
     public int getACTION_POINTS_LIMIT() {
         return ACTION_POINTS_LIMIT;
@@ -45,6 +49,17 @@ public abstract class BaseCharacter {
 
     protected BaseCharacterState baseCharacterState;
 
+    protected int currentLivePoint;
+    
+    protected boolean isHighlight;
+
+    protected boolean isHighlightForAttack;
+
+    protected Color colorOfHighlightForSelected;
+    protected Color colorOfHighlightForAttack;
+
+    protected List<BaseCharacter> tagetPossibleList;
+
     public BaseCharacter(){
        initializeVariable();
     }
@@ -61,6 +76,10 @@ public abstract class BaseCharacter {
         isAlive = true;
         speed = 900;
         baseCharacterState = BaseCharacterState.waiting;
+        currentLivePoint = 3;
+        itemCharacter = new Pistole(50,10,20);
+        colorOfHighlightForSelected = new Color(0,1,0,0.5f);
+        colorOfHighlightForAttack = new Color(1,0,0,0.5f);
     }
 
     public Vector2 getPosition() {
@@ -128,21 +147,59 @@ public abstract class BaseCharacter {
         return baseCharacterState;
     }
 
+    public int getCurrentLivePoint() {
+        return currentLivePoint;
+    }
+
+    public void setCurrentLivePoint(int currentLivePoint) {
+        this.currentLivePoint = currentLivePoint;
+    }
+
+    public Item getItemCharacter() {
+        return itemCharacter;
+    }
+
+    public void setItemCharacter(Item itemCharacter) {
+        this.itemCharacter = itemCharacter;
+    }
+
     public void draw(SpriteBatch batch){
         if(spriteCharacter != null && isAlive){
             spriteCharacter.draw(batch);
         }
     }
 
+    public void drawHighlight(ShapeRenderer shapeRenderer){
+        if(isHighlight && spriteCharacter != null && isAlive){
+            Color currentColor = shapeRenderer.getColor();
+            if(isHighlightForAttack){
+                shapeRenderer.setColor(colorOfHighlightForAttack);
+            }
+            else {
+                shapeRenderer.setColor(colorOfHighlightForSelected);
+            }
+            shapeRenderer.setColor(currentColor);
+            shapeRenderer.rect(position.x, position.y, spriteCharacter.getWidth(), spriteCharacter.getHeight());
+        }
+    }
+
+    public List<BaseCharacter> getTagetPossibleList() {
+        return tagetPossibleList;
+    }
+
+    public void setTagetPossibleList(List<BaseCharacter> tagetPossibleList) {
+        this.tagetPossibleList = tagetPossibleList;
+    }
+
     /*
-    CODE EMPRUNTÉ :
-       Les lignes suivantes sont basées sur la classe
-       provenant du site :
-      https://bitbucket.org/dermetfan/somelibgdxtests/src/8f2d5d953c42c9c1f52ce588a4abfa450995480e/src/net/dermetfan/someLibgdxTests/entities/AISprite.java?at=default&fileviewer=file-view-default
-      J'ai pris la méthode update qui calcule la prochaine position du personnage entre sa position actuel et la position qu'il doit atteindre
-      dépendement du nombre de seconde qui se sont écoulé depuis le dernier frame.
-      Je l'ai modifier pour utiliser une liste de noeud (fait par le path finding) au lieu du liste de vecteur
-    */
+        CODE EMPRUNTÉ :
+           Les lignes suivantes sont basées sur la classe
+           provenant du site :
+          https://bitbucket.org/dermetfan/somelibgdxtests/src/8f2d5d953c42c9c1f52ce588a4abfa450995480e/src/net/dermetfan/someLibgdxTests/entities/AISprite.java?at=default&fileviewer=file-view-default
+          J'ai pris la méthode update qui calcule la prochaine position du personnage entre sa position actuel et la position qu'il doit atteindre
+          dépendement du nombre de seconde qui se sont écoulé depuis le dernier frame.
+          Je l'ai modifier pour utiliser une liste de noeud (fait par le path finding) au lieu du liste de vecteur
+        */
     public void update(float delta){
         if(pathToWalk != null && baseCharacterState == BaseCharacterState.moving) {
             nextPosition = pathToWalk.get(waypoint);
@@ -268,6 +325,42 @@ public abstract class BaseCharacter {
         this.baseCharacterState = baseCharacterState.overwatch;
         setCurrentActionPoints(0);
         Gdx.app.log("info", this + "has used overwatch");
+    }
+
+    public void characterGetIt(int damagePoint){
+        currentActionPoints -= damagePoint;
+        if (currentActionPoints <= 0){
+            isAlive = false;
+        }
+    }
+
+    public void attack(BaseCharacter characterToAttack){
+
+    }
+
+    public void highlightSelectedCharacter(){
+        isHighlight = true;
+        isHighlightForAttack = false;
+    }
+
+    public void highlightSelectedCharacter(Color colorOfHighlight){
+        this.colorOfHighlightForSelected = colorOfHighlight;
+        highlightSelectedCharacter();
+    }
+
+    public void highlightCharacterForAttack(){
+        isHighlight = true;
+        isHighlightForAttack = true;
+    }
+
+    public void highlightCharacterForAttack(Color colorOfHighlight){
+        this.colorOfHighlightForAttack = colorOfHighlight;
+        highlightCharacterForAttack();
+    }
+
+    public void unHighlightCharacter(){
+        isHighlight = false;
+        isHighlightForAttack = false;
     }
 
     public enum BaseCharacterState {
