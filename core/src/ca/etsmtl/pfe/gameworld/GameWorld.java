@@ -9,7 +9,6 @@ import java.util.ArrayList;
 
 import ca.etsmtl.pfe.gameobjects.BaseCharacter;
 import ca.etsmtl.pfe.gameobjects.PlayerCharacter;
-import ca.etsmtl.pfe.helper.LevelLoader;
 import ca.etsmtl.pfe.pathfinding.Node;
 import ca.etsmtl.pfe.ui.gamemenu.Menu;
 
@@ -20,30 +19,26 @@ public class GameWorld {
     private Menu menu;
     private ArrayList<BaseCharacter> ennemies;
     private ArrayList<PlayerCharacter> playerCharacters;
-    protected boolean changeToPlayerTurnFlag;
-
-    public PlayerCharacter getSelectedCharacter() {
-        return selectedCharacter;
-    }
-
+    private boolean changeToPlayerTurnFlag;
+    private GameWorldState gameWorldState;
     private PlayerCharacter selectedCharacter;
     private int selectedCharacterIndex;
     public final int DEFAULT_TILE_SIZE = 160;
     public boolean turnNeedsInit = true;
     private int nbOfDonePlayers, nbOfDoneEnemies, nbPlayerMoving;
-    private GameWorldState gameWorldState;
+    
     
     public GameWorld(GameRenderer gameRenderer,Menu menu){
         this.gameRenderer = gameRenderer;
         this.menu = menu;
-        this.changeToPlayerTurnFlag = false;
+        this.changeToPlayerTurnFlag = true;
         gameMap = new GameMap();
         gameRenderer.setCurrentMap(gameMap);
         ennemies = new ArrayList<BaseCharacter>();
         playerCharacters = new ArrayList<PlayerCharacter>(2);
         this.nbOfDonePlayers = 0;
+        gameWorldState = GameWorldState.waitngForAction;
         selectedCharacterIndex = -1;
-        gameWorldState = GameWorldState.wattingAction;
     }
 
     public void update(float delta){
@@ -72,7 +67,7 @@ public class GameWorld {
             if(selectedCharacter != null &&
                     selectedCharacter.getBaseCharacterState() == BaseCharacter.BaseCharacterState.waiting &&
                     gameWorldState == GameWorldState.movingPlayer){
-                setGameWorldState(GameWorldState.wattingAction);
+                setGameWorldState(GameWorldState.waitngForAction);
             }
 
             if (nbOfDonePlayers >= playerCharacters.size()) {
@@ -101,12 +96,56 @@ public class GameWorld {
                 turnNeedsInit = true;
             }
         }
+
+        postUpdateChecks();
+
+    }
+
+    private void postUpdateChecks() {
+
+        if (this.gameWorldState ==  GameWorldState.waitngForAction) {
+            // check if all ennemies are dead ou any pc is dead
+            for (PlayerCharacter pc : this.playerCharacters) {
+                if (!pc.isAlive()) {
+                    this.gameWorldState = GameWorldState.lose;
+                }
+            }
+
+            boolean everyEnemyDead = true;
+            for (BaseCharacter enemy : this.ennemies) {
+                if (enemy.isAlive()) {
+                    everyEnemyDead = false;
+                }
+            }
+            if(everyEnemyDead) {
+                this.gameWorldState = GameWorldState.win;
+            }
+        }
+
+        if (this.gameWorldState == GameWorldState.win) {
+
+            triggerWin();
+
+        } else if (this.gameWorldState == GameWorldState.lose) {
+
+            triggerGameOver();
+        }
+    }
+
+    private void triggerWin() {
+        Gdx.app.log("info", "YOU WIN' YOU CRAZY KILLER");
+
+    }
+
+    private void triggerGameOver() {
+        Gdx.app.log("info", "GG YOU DEAD");
+
+
     }
 
     public void translateCamera(float x, float y){
         gameRenderer.tranlateCamera(x, y);
     }
-
 
     public void initPlayerTurn() {
         nbOfDonePlayers = 0;
@@ -130,9 +169,10 @@ public class GameWorld {
         this.turnNeedsInit = false;
     }
 
+
     public void handleTapScreen(float screenX, float screenY){
         switch (gameWorldState){
-            case wattingAction:
+            case waitngForAction:
                 changeCharacterPosition(screenX, screenY);
                 break;
             case usingItem:
@@ -144,6 +184,10 @@ public class GameWorld {
     public void setLastScreenPositionClick(float screenX, float screenY){
         //for debug info
         gameRenderer.setLastScreenPositionClick(screenX, screenY);
+    }
+
+    public PlayerCharacter getSelectedCharacter() {
+        return selectedCharacter;
     }
 
     private void changeCharacterPosition(float screenX, float screenY){
@@ -181,7 +225,7 @@ public class GameWorld {
                         ennemies.remove(ennemy);
                         gameRenderer.removeCharacterToDraw(ennemy);
                     }
-                    setGameWorldState(GameWorldState.wattingAction);
+                    setGameWorldState(GameWorldState.waitngForAction);
                     menu.resetTextUseButton();
                     updateItemMenuInfo();
                     break;
@@ -228,7 +272,7 @@ public class GameWorld {
 
     public void setGameWorldState(GameWorldState gameWorldState) {
         this.gameWorldState = gameWorldState;
-        if(gameWorldState == GameWorldState.wattingAction){
+        if(gameWorldState == GameWorldState.waitngForAction){
             if(selectedCharacter != null) {
                 for (BaseCharacter ennemy : selectedCharacter.getTagetPossibleList()){
                     ennemy.unHighlightCharacter();
@@ -274,7 +318,7 @@ public class GameWorld {
     }
 
     public void changeSelectedCharacter(){
-        if(playerCharacters != null && gameWorldState == GameWorldState.wattingAction) {
+        if(playerCharacters != null && gameWorldState == GameWorldState.waitngForAction) {
             if (selectedCharacter == null || selectedCharacter.getBaseCharacterState() == BaseCharacter.BaseCharacterState.waiting) {
                 if(selectedCharacter != null) {
                     selectedCharacter.unHighlightCharacter();
@@ -296,7 +340,9 @@ public class GameWorld {
     }
 
     public enum GameWorldState {
-        usingItem,movingPlayer,wattingAction
-    }
+        usingItem,movingPlayer,waitngForAction, lose, win   }
 
+    public ArrayList<PlayerCharacter> getPlayerCharacters() {
+        return playerCharacters;
+    }
 }

@@ -22,6 +22,7 @@ public class Node implements IndexedNode<Node> {
     private int tileY;
     private int tilePixelX;
     private int tilePixelY;
+    private boolean shootableTrough;
 
     public Node(){
         this(0,0,0);
@@ -120,6 +121,14 @@ public class Node implements IndexedNode<Node> {
         result = 31 * result + tilePixelX;
         result = 31 * result + tilePixelY;
         return result;
+    }
+
+    public boolean isShootableTrough() {
+        return shootableTrough;
+    }
+
+    public void setShootableTrough(boolean shootableTrough) {
+        this.shootableTrough = shootableTrough;
     }
 }
 /* FIN DU CODE EMPRUNTÉ */

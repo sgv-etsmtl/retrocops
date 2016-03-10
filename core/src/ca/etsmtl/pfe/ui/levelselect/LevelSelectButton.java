@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.utils.Align;
 
 public class LevelSelectButton extends Button {
 
@@ -16,7 +17,7 @@ public class LevelSelectButton extends Button {
         super(style);
         this.label = label;
         this.image = image;
-        this.stack(image,label);
+        this.stack(image, label);
     }
 
     @Override

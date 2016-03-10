@@ -7,12 +7,14 @@ import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.fsm.StateMachine;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.compression.lzma.Base;
 
 import java.util.ArrayList;
-import java.util.concurrent.ThreadLocalRandom;
+
 
 import ca.etsmtl.pfe.gameobjects.BaseCharacter;
+import ca.etsmtl.pfe.gameobjects.PlayerCharacter;
 import ca.etsmtl.pfe.gameworld.GameWorld;
 import ca.etsmtl.pfe.helper.AssetLoader;
 import ca.etsmtl.pfe.pathfinding.Node;
@@ -20,26 +22,25 @@ import ca.etsmtl.pfe.pathfinding.Node;
 public class Goon extends BaseCharacter{
 
 
+    private static final float AI_SIGHT_RANGE = 6 ;
     private StateMachine<Goon, GoonState> stateMachine;
-    private GameWorld gameWorld;
     private boolean enemyInSight;
     private int nbIdleTurns;
     private ArrayList<BaseCharacter> targetList;
-    private ArrayList<Vector2> lastKnownEnemyPosition;
+    private ArrayList<Node> lastKnownEnemyPosition;
 
     public Goon(int positionX, int positionY, GameWorld gameWorld) {
+        super(gameWorld);
         stateMachine = new DefaultStateMachine(this, GoonState.CALM);
-        initializeVariable();
-        setCharacterSprite(new Sprite(AssetLoader.testSprite, 0, 160, 160, 160));
+        setCharacterSprite(new Sprite(AssetLoader.testSprite, 0, 160, gameWorld.DEFAULT_TILE_SIZE, gameWorld.DEFAULT_TILE_SIZE));
 
         this.nbIdleTurns = 0;
         this.currentActionPoints = ACTION_POINTS_LIMIT;
         this.enemyInSight = false;
         this.isDone = false;
         this.targetList = new ArrayList<BaseCharacter>();
-        this.lastKnownEnemyPosition = new ArrayList<Vector2>();
-        this.gameWorld = gameWorld;
-        setPosition(positionX * 160, positionY * 160);
+        this.lastKnownEnemyPosition = new ArrayList<Node>();
+        setPosition(positionX * gameWorld.DEFAULT_TILE_SIZE, positionY * gameWorld.DEFAULT_TILE_SIZE);
     }
 
     @Override
@@ -50,11 +51,49 @@ public class Goon extends BaseCharacter{
                 stateMachine.update();
                 super.update(delta);
             }
-            if (this.currentActionPoints == 0) {
+
+            if (this.currentActionPoints <= 0) {
+                this.setIsDone(true);
+            }
+            if(this.getCurrentActionPoints() <= 0) {
                 this.setIsDone(true);
             }
         }
     }
+
+    @Override
+    public void updateTargetList() {
+
+        ArrayList<PlayerCharacter> pcs = this.gameWorld.getPlayerCharacters();
+
+        Gdx.app.log("info", "Goon " + this + " is at position " + this.position);
+
+        for (PlayerCharacter pc : pcs) {
+
+            Gdx.app.log("info", "PC is at " + pc.getPosition());
+
+
+            if (this.getPosition().dst(pc.getPosition().x, pc.getPosition().y) < AI_SIGHT_RANGE * gameWorld.DEFAULT_TILE_SIZE
+                    && this.canRaytrace(pc)) {
+                this.targetList.add(pc);
+            }
+        }
+    }
+
+    private void updateState() {
+
+        Gdx.app.log("info", "in updateState, BEFORE targetlist size is :" + this.targetList.size());
+        updateTargetList();
+        Gdx.app.log("info", "in updateState, AFTER targetlist size is :" + this.targetList.size());
+
+        if (!this.targetList.isEmpty() || !this.lastKnownEnemyPosition.isEmpty() ) {
+
+            this.stateMachine.changeState(GoonState.ALERT);
+            Gdx.app.log("info", "Switching into ALERT Mode" + this);
+        }
+    }
+
+
 
     public void patrol(){
         int nbOfNeighbours = 0;
@@ -64,7 +103,7 @@ public class Goon extends BaseCharacter{
         nbOfNeighbours = currentNode.getConnections().size;
 
         if (nbOfNeighbours > 0) {
-            int i = ThreadLocalRandom.current().nextInt(0, nbOfNeighbours -1);
+            int i = MathUtils.random(0, nbOfNeighbours - 1);
             Node targetNode = currentNode.getConnections().get(i).getToNode();
 
             gameWorld.changeCharacterTilePosition(currentNode, targetNode, this);
@@ -72,8 +111,16 @@ public class Goon extends BaseCharacter{
         //    Gdx.app.log("info", "PATROL from x: " + currentNode.getTileX() + " | y: " + currentNode.getTileY());
         //    Gdx.app.log("info", "PATROL to x: " + targetNode.getTileX() + " | y: " + targetNode.getTileY());
         }
+        else {
+            //stuck or cornered
+            this.setBaseCharacterState(BaseCharacterState.overwatch);
+        }
     }
 
+    @Override
+    public void attack(BaseCharacter target) {
+        super.attack(target);
+    }
 
 
 // AI States, adapted from the exemples on this page https://github.com/libgdx/gdx-ai/wiki/State-Machine
@@ -87,9 +134,8 @@ public class Goon extends BaseCharacter{
                     goon.patrol();
                 }
 
-                if (goon.enemyInSight) {
-                    goon.stateMachine.changeState(ALERT);
-                }
+                goon.updateState();
+
             }
         },
 
@@ -97,18 +143,27 @@ public class Goon extends BaseCharacter{
             @Override
             public void update(Goon goon) {
 
-                Gdx.app.log("info", "alert PLACEHOLDER *******" + this);
+                //Gdx.app.log("info", "alert PLACEHOLDER *******" + this);
+                Gdx.app.log("info", "ALERTED Goon target list *******" + goon.targetList);
 
                 if (!goon.targetList.isEmpty()) {
-                    //shoot weakest target
+
+                    BaseCharacter chosenTarget = goon.targetList.get(0);
+                    for (BaseCharacter target : goon.targetList) {
+                        if (chosenTarget != null && target.getCurrentHitPoints() < chosenTarget.getCurrentHitPoints()) {
+                            chosenTarget = target;
+                        }
+                    }
+                    goon.attack(chosenTarget);
+
                 } else if (!goon.lastKnownEnemyPosition.isEmpty()) {
 
                     //moveToward closest position
+                } else {
+                    goon.useOverwatch();
                 }
             }
         };
-
-
 
         @Override
         public void enter(Goon goon) {
@@ -117,12 +172,12 @@ public class Goon extends BaseCharacter{
         @Override
         public void exit(Goon goon) {
         }
-
-        @Override
+    @Override
         public boolean onMessage(Goon goon, Telegram telegram) {
             // We don't use messaging in this game
             return false;
         }
+
     }
 
 }
