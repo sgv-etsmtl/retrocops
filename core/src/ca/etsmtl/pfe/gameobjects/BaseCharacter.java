@@ -6,9 +6,11 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.compression.lzma.Base;
 
+import ca.etsmtl.pfe.gameworld.GameWorld;
 import ca.etsmtl.pfe.pathfinding.Node;
 
 public abstract class BaseCharacter {
@@ -27,6 +29,9 @@ public abstract class BaseCharacter {
     protected float speed;
     protected int waypoint = 0;
     protected boolean isDone;
+    protected GameWorld gameWorld;
+    /* FIN DU CODE EMPRUNTÉ */
+
 
     public int getACTION_POINTS_LIMIT() {
         return ACTION_POINTS_LIMIT;
@@ -34,23 +39,28 @@ public abstract class BaseCharacter {
 
     protected final int ACTION_POINTS_LIMIT = 2;
     protected int currentActionPoints = 0;
-    /* FIN DU CODE EMPRUNTÉ */
+    protected final int HIT_POINTS_LIMIT = 2;
+    protected int currentHitPoints = 2;
+
 
     protected boolean isAlive;
     Sprite spriteCharacter;
 
     protected DefaultGraphPath<Node> pathToWalk;
 
+    protected Node currentNode;
     protected Node nextPosition;
 
     protected BaseCharacterState baseCharacterState;
 
-    public BaseCharacter(){
-       initializeVariable();
+    public BaseCharacter(GameWorld gameWorld){
+        this.gameWorld = gameWorld;
+        initializeVariable();
     }
 
 
-    public BaseCharacter(int positionX, int positionY){
+    public BaseCharacter(int positionX, int positionY, GameWorld gameWorld){
+        this.gameWorld = gameWorld;
         initializeVariable();
         setPosition(positionX, positionY);
     }
@@ -158,10 +168,10 @@ public abstract class BaseCharacter {
                     setPosition(nextPosition.getTilePixelX(), nextPosition.getTilePixelY());
                     if (waypoint + 1 < pathToWalk.getCount()) {
                         waypoint++;
-                    }
-                    else{
+                    } else {
                         baseCharacterState = BaseCharacterState.waiting;
                         this.currentActionPoints--;
+                        updateTargetList();
                     }
                 }
             }
@@ -175,6 +185,54 @@ public abstract class BaseCharacter {
         }
     }
     /* FIN DU CODE EMPRUNTÉ */
+
+    public abstract void updateTargetList();
+
+    //Code emprunté et adapté de la 3eme fonction de cette page.
+    // http://playtechs.blogspot.ca/2007/03/raytracing-on-grid.html
+    public boolean canRaytrace(BaseCharacter targetCharacter)
+    {
+        int x0 = (int) (this.getPosition().x / this.gameWorld.DEFAULT_TILE_SIZE) ;
+        int y0 = (int) (this.getPosition().y / this.gameWorld.DEFAULT_TILE_SIZE) ;
+        int x1 = (int) (targetCharacter.getPosition().x / this.gameWorld.DEFAULT_TILE_SIZE) ;
+        int y1 = (int) (targetCharacter.getPosition().y / this.gameWorld.DEFAULT_TILE_SIZE) ;
+
+        int dx = Math.abs(x1 - x0);
+        int dy = Math.abs(y1 - y0);
+        int x = x0;
+        int y = y0;
+        int n = 1 + dx + dy;
+        int x_inc = (x1 > x0) ? 1 : -1;
+        int y_inc = (y1 > y0) ? 1 : -1;
+        int error = dx - dy;
+        dx *= 2;
+        dy *= 2;
+
+        for (; n > 0; --n)
+        {
+            // TILE IS CROSSED BY RAY; CHECK IF WALL,
+            // IF ANY TILE IS WALL: BREAK OUT;
+            Gdx.app.log("info", "raytracing on " + x + " : " + y);
+
+
+            if( this.gameWorld.getGameMap().isCellBlocked(x,y)) {
+                Gdx.app.log("info", "wall found at " + x + " : " + y);
+
+                return false;
+            }
+
+            if (error > 0)
+            {
+                x += x_inc;
+                error -= dy;
+            } else {
+                y += y_inc;
+                error += dx;
+            }
+        }
+        return true;
+    }
+    //fin du code emprunté
 
     /*
     CODE EMPRUNTÉ :
@@ -203,12 +261,13 @@ public abstract class BaseCharacter {
         if(pathToWalk != null) {
             shapeRenderer.setColor(Color.WHITE);
             Node previous = null;
+            int halfTile =  + gameWorld.DEFAULT_TILE_SIZE / 2;
             for (Node node : pathToWalk) {
                 if (previous != null) {
-                    shapeRenderer.line(previous.getTilePixelX(), previous.getTilePixelY(),
-                            node.getTilePixelX(), node.getTilePixelY());
+                    shapeRenderer.line(previous.getTilePixelX() + halfTile, previous.getTilePixelY() + halfTile,
+                            node.getTilePixelX() + halfTile, node.getTilePixelY() + halfTile);
                 }
-                shapeRenderer.circle(node.getTilePixelX(), node.getTilePixelY(), 10, 10);
+                shapeRenderer.circle(node.getTilePixelX() + halfTile, node.getTilePixelY() + halfTile, 10, 10);
                 previous = node;
             }
         }
@@ -248,12 +307,21 @@ public abstract class BaseCharacter {
         return currentActionPoints;
     }
 
-    public void setBaseCharacterState(BaseCharacterState baseCharacterState) {
-        this.baseCharacterState = baseCharacterState;
-    }
-
     public void setCurrentActionPoints(int currentActionPoints) {
         this.currentActionPoints = currentActionPoints;
+    }
+
+    public int getCurrentHitPoints() {
+        return currentHitPoints;
+    }
+
+    public void setCurrentHitPoints(int currentHitPoints) {
+        this.currentHitPoints = currentHitPoints;
+    }
+
+
+    public void setBaseCharacterState(BaseCharacterState baseCharacterState) {
+        this.baseCharacterState = baseCharacterState;
     }
 
     public void setIsDone(boolean isDone) {
@@ -268,6 +336,26 @@ public abstract class BaseCharacter {
         this.baseCharacterState = baseCharacterState.overwatch;
         setCurrentActionPoints(0);
         Gdx.app.log("info", this + "has used overwatch");
+    }
+
+    public Node getCurrentNode() {
+        //return this.currentNode;
+        return this.gameWorld.getGameMap().getMapGraph()
+            .getNodeByTileXY(this.getPosition().x / this.gameWorld.DEFAULT_TILE_SIZE,
+                    this.getPosition().x / this.gameWorld.DEFAULT_TILE_SIZE,
+                    this.gameWorld.getGameMap().getNumberOfTileWidth());
+    }
+
+    public void attack(BaseCharacter chosenTarget) {
+
+        chosenTarget.setCurrentHitPoints(chosenTarget.getCurrentHitPoints() - 1);
+        this.currentActionPoints = 0;
+
+        if(chosenTarget.currentHitPoints <= 0) {
+            chosenTarget.isAlive = false;
+        }
+        Gdx.app.log("info", this + " is attacking " + chosenTarget);
+        Gdx.app.log("info", chosenTarget + " has " + chosenTarget.getCurrentHitPoints() + " HP left");
     }
 
     public enum BaseCharacterState {

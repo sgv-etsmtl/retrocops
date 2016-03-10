@@ -1,0 +1,96 @@
+
+unamed.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+wall-vertical
+  rotate: false
+  xy: 0, 320
+  size: 160, 160
+  orig: 160, 160
+  offset: 0, 0
+  index: -1
+wall-corner-tr
+  rotate: false
+  xy: 0, 160
+  size: 160, 160
+  orig: 160, 160
+  offset: 0, 0
+  index: -1
+wall-corner-tl
+  rotate: false
+  xy: 160, 320
+  size: 160, 160
+  orig: 160, 160
+  offset: 0, 0
+  index: -1
+wall-corner-bl
+  rotate: false
+  xy: 0, 0
+  size: 160, 160
+  orig: 160, 160
+  offset: 0, 0
+  index: -1
+wall-left
+  rotate: false
+  xy: 160, 160
+  size: 160, 160
+  orig: 160, 160
+  offset: 0, 0
+  index: -1
+wall-horizontal
+  rotate: false
+  xy: 320, 320
+  size: 160, 160
+  orig: 160, 160
+  offset: 0, 0
+  index: -1
+wall-right
+  rotate: false
+  xy: 160, 0
+  size: 160, 160
+  orig: 160, 160
+  offset: 0, 0
+  index: -1
+wood-flood-details
+  rotate: false
+  xy: 320, 160
+  size: 160, 160
+  orig: 160, 160
+  offset: 0, 0
+  index: -1
+wall-bot
+  rotate: false
+  xy: 480, 320
+  size: 160, 160
+  orig: 160, 160
+  offset: 0, 0
+  index: -1
+wood-floor-plain
+  rotate: false
+  xy: 320, 0
+  size: 160, 160
+  orig: 160, 160
+  offset: 0, 0
+  index: -1
+red square
+  rotate: false
+  xy: 480, 160
+  size: 160, 160
+  orig: 160, 160
+  offset: 0, 0
+  index: -1
+wall-corner-br
+  rotate: false
+  xy: 640, 320
+  size: 160, 160
+  orig: 160, 160
+  offset: 0, 0
+  index: -1
+wall-top
+  rotate: false
+  xy: 480, 0
+  size: 160, 160
+  orig: 160, 160
+  offset: 0, 0
+  index: -1

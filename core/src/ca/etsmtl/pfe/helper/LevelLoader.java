@@ -28,14 +28,14 @@ public class LevelLoader {
         return gameLevelInfo;
     }
 
-    public static LevelInfo getLevelInfo(int indexLeve){
+    public static LevelInfo getLevelInfo(int indexLevel){
         if(!loaded ||
-           indexLeve >= gameLevelInfo.getLevelsName().size() ||
-           indexLeve >= gameLevelInfo.getPathsLevelImage().size() ||
-           indexLeve >= gameLevelInfo.getPathsLevelInfo().size()){
+           indexLevel >= gameLevelInfo.getLevelsName().size() ||
+           indexLevel >= gameLevelInfo.getPathsLevelImage().size() ||
+           indexLevel >= gameLevelInfo.getPathsLevelInfo().size()){
             return null;
         }
-        FileHandle file = Gdx.files.internal(gameLevelInfo.getPathsLevelInfo().get(indexLeve));
+        FileHandle file = Gdx.files.internal(gameLevelInfo.getPathsLevelInfo().get(indexLevel));
         return gson.fromJson(file.readString(), LevelInfo.class);
     }
 
@@ -46,7 +46,7 @@ public class LevelLoader {
             gameWorld.changeMap(levelInfo.getMapFilePath());
 
             for(PlayerInfo players : levelInfo.getPlayers()){
-                gameWorld.addCharacterPlayer(players.getPlayerFromInfo());
+                gameWorld.addCharacterPlayer(players.getPlayerFromInfo(gameWorld));
             }
 
             for(GoonInfo enemies : levelInfo.getGoonEnnemies()){

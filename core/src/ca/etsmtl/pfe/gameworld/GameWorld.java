@@ -20,7 +20,11 @@ public class GameWorld {
     private Menu menu;
     private ArrayList<BaseCharacter> ennemies;
     private ArrayList<PlayerCharacter> playerCharacters;
-    protected boolean changeToPlayerTurnFlag;
+    private boolean changeToPlayerTurnFlag;
+    private enum GameWorldState{
+        ongoing,lose,win
+    }
+    private GameWorldState gameWorldState;
 
     public PlayerCharacter getSelectedCharacter() {
         return selectedCharacter;
@@ -35,12 +39,12 @@ public class GameWorld {
     public GameWorld(GameRenderer gameRenderer,Menu menu){
         this.gameRenderer = gameRenderer;
         this.menu = menu;
-        this.changeToPlayerTurnFlag = false;
+        this.changeToPlayerTurnFlag = true;
         gameMap = new GameMap();
         gameRenderer.setCurrentMap(gameMap);
         ennemies = new ArrayList<BaseCharacter>();
         playerCharacters = new ArrayList<PlayerCharacter>(2);
-        this.nbOfDonePlayers = 0;
+        gameWorldState = GameWorldState.ongoing;
 
         //this is for debug
         LevelLoader.loadLever(this, 0);
@@ -97,6 +101,51 @@ public class GameWorld {
                 turnNeedsInit = true;
             }
         }
+
+        postUpdateChecks();
+
+    }
+
+    private void postUpdateChecks() {
+
+        if (this.gameWorldState ==  GameWorldState.ongoing) {
+            // check if all ennemies are dead ou any pc is dead
+            for (PlayerCharacter pc : this.playerCharacters) {
+                if (!pc.isAlive()) {
+                    this.gameWorldState = GameWorldState.lose;
+                }
+            }
+
+            boolean everyEnemyDead = true;
+            for (BaseCharacter enemy : this.ennemies) {
+                if (enemy.isAlive()) {
+                    everyEnemyDead = false;
+                }
+            }
+            if(everyEnemyDead) {
+                this.gameWorldState = GameWorldState.win;
+            }
+        }
+
+        if (this.gameWorldState == GameWorldState.win) {
+
+            triggerWin();
+
+        } else if (this.gameWorldState == GameWorldState.lose) {
+
+            triggerGameOver();
+        }
+    }
+
+    private void triggerWin() {
+        Gdx.app.log("info", "YOU WIN' YOU CRAZY KILLER");
+
+    }
+
+    private void triggerGameOver() {
+        Gdx.app.log("info", "GG YOU DEAD");
+
+
     }
 
     public void translateCamera(float x, float y){
@@ -215,4 +264,7 @@ public class GameWorld {
         }
     }
 
+    public ArrayList<PlayerCharacter> getPlayerCharacters() {
+        return playerCharacters;
+    }
 }
