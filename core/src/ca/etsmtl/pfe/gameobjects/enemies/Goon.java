@@ -8,7 +8,6 @@ import com.badlogic.gdx.ai.fsm.StateMachine;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.utils.compression.lzma.Base;
 
 import java.util.ArrayList;
 
@@ -26,7 +25,6 @@ public class Goon extends BaseCharacter{
     private StateMachine<Goon, GoonState> stateMachine;
     private boolean enemyInSight;
     private int nbIdleTurns;
-    private ArrayList<BaseCharacter> targetList;
     private ArrayList<Node> lastKnownEnemyPosition;
 
     public Goon(int positionX, int positionY, GameWorld gameWorld) {
@@ -48,8 +46,8 @@ public class Goon extends BaseCharacter{
 
         if(!this.isDone) {
             if (this.getCurrentActionPoints() >= 0) {
-                stateMachine.update();
                 super.update(delta);
+                stateMachine.update();
             }
 
             if (this.currentActionPoints <= 0) {
@@ -63,14 +61,14 @@ public class Goon extends BaseCharacter{
 
     @Override
     public void updateTargetList() {
-
+        this.targetList.clear();
         ArrayList<PlayerCharacter> pcs = this.gameWorld.getPlayerCharacters();
 
         Gdx.app.log("info", "Goon " + this + " is at position " + this.position);
 
         for (PlayerCharacter pc : pcs) {
 
-            Gdx.app.log("info", "PC is at " + pc.getPosition());
+           Gdx.app.log("info", "PC is at " + pc.getPosition());
 
 
             if (this.getPosition().dst(pc.getPosition().x, pc.getPosition().y) < AI_SIGHT_RANGE * gameWorld.DEFAULT_TILE_SIZE
@@ -82,11 +80,11 @@ public class Goon extends BaseCharacter{
 
     private void updateState() {
 
-        Gdx.app.log("info", "in updateState, BEFORE targetlist size is :" + this.targetList.size());
         updateTargetList();
-        Gdx.app.log("info", "in updateState, AFTER targetlist size is :" + this.targetList.size());
 
-        if (!this.targetList.isEmpty() || !this.lastKnownEnemyPosition.isEmpty() ) {
+        if (this.stateMachine.getCurrentState().equals(GoonState.CALM)
+                && this.baseCharacterState == BaseCharacterState.waiting
+                && (!this.targetList.isEmpty() || !this.lastKnownEnemyPosition.isEmpty() ) ) {
 
             this.stateMachine.changeState(GoonState.ALERT);
             Gdx.app.log("info", "Switching into ALERT Mode" + this);
@@ -95,30 +93,34 @@ public class Goon extends BaseCharacter{
 
 
 
-    public void patrol(){
-        int nbOfNeighbours = 0;
-        Node currentNode = gameWorld.getGameMap().getMapGraph().getNodeByTileXY(this.getPosition().x / gameWorld.DEFAULT_TILE_SIZE,
-                                                                                this.getPosition().y / gameWorld.DEFAULT_TILE_SIZE,
-                                                                                this.gameWorld.getGameMap().getNumberOfTileWidth());
-        nbOfNeighbours = currentNode.getConnections().size;
+    public void patrol() {
+        if(this.baseCharacterState == BaseCharacterState.waiting) {
 
-        if (nbOfNeighbours > 0) {
-            int i = MathUtils.random(0, nbOfNeighbours - 1);
-            Node targetNode = currentNode.getConnections().get(i).getToNode();
+            int nbOfNeighbours = 0;
+            Node currentNode = gameWorld.getGameMap().getMapGraph().getNodeByTileXY(this.getPosition().x / gameWorld.DEFAULT_TILE_SIZE,
+                    this.getPosition().y / gameWorld.DEFAULT_TILE_SIZE,
+                    this.gameWorld.getGameMap().getNumberOfTileWidth());
+            nbOfNeighbours = currentNode.getConnections().size;
 
-            gameWorld.changeCharacterTilePosition(currentNode, targetNode, this);
+            if (nbOfNeighbours > 0) {
+                int i = MathUtils.random(0, nbOfNeighbours - 1);
+                Node targetNode = currentNode.getConnections().get(i).getToNode();
 
-        //    Gdx.app.log("info", "PATROL from x: " + currentNode.getTileX() + " | y: " + currentNode.getTileY());
-        //    Gdx.app.log("info", "PATROL to x: " + targetNode.getTileX() + " | y: " + targetNode.getTileY());
-        }
-        else {
-            //stuck or cornered
-            this.setBaseCharacterState(BaseCharacterState.overwatch);
+                gameWorld.changeCharacterTilePosition(currentNode, targetNode, this);
+
+                //    Gdx.app.log("info", "PATROL from x: " + currentNode.getTileX() + " | y: " + currentNode.getTileY());
+                //    Gdx.app.log("info", "PATROL to x: " + targetNode.getTileX() + " | y: " + targetNode.getTileY());
+            }
+            else {
+                //stuck or cornered
+                this.setBaseCharacterState(BaseCharacterState.overwatch);
+            }
         }
     }
 
     @Override
     public void attack(BaseCharacter target) {
+        this.itemCharacter.attack(target);
         super.attack(target);
     }
 
@@ -130,11 +132,10 @@ public class Goon extends BaseCharacter{
             @Override
             public void update(Goon goon) {
 
-                if(goon.baseCharacterState == BaseCharacterState.waiting) {
+                goon.updateState();
+                if(goon.stateMachine.getCurrentState() == GoonState.CALM) {
                     goon.patrol();
                 }
-
-                goon.updateState();
 
             }
         },
@@ -154,6 +155,7 @@ public class Goon extends BaseCharacter{
                             chosenTarget = target;
                         }
                     }
+                    Gdx.app.log("info", goon + " is attacking " + chosenTarget);
                     goon.attack(chosenTarget);
 
                 } else if (!goon.lastKnownEnemyPosition.isEmpty()) {

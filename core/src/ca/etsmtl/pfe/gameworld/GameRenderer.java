@@ -124,13 +124,22 @@ public class GameRenderer {
 
     private void drawCharacter(boolean drawDebug){
         characterBatcher.setProjectionMatrix(cam.combined);
+        shapeRenderer.setProjectionMatrix(cam.combined);
         characterBatcher.begin();
         for(BaseCharacter character : characterToDraw){
             character.draw(characterBatcher);
         }
         characterBatcher.end();
+
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        for(BaseCharacter character : characterToDraw){
+            character.drawHighlight(shapeRenderer);
+        }
+        shapeRenderer.end();
+        Gdx.gl.glDisable(GL20.GL_BLEND);
         if(drawDebug){
-            shapeRenderer.setProjectionMatrix(cam.combined);
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
             for(BaseCharacter character : characterToDraw){
                 character.drawPathDebug(shapeRenderer);
@@ -156,10 +165,16 @@ public class GameRenderer {
 
     }
 
-    public Vector3 transformScreenLocationToWorldLocation(float x, float y){
-        Vector3 position = new Vector3();
+    public void setLastScreenPositionClick(float x, float y){
         lastScreenPositionClick.x = x;
         lastScreenPositionClick.y = y;
+        worldPosition.x = x;
+        worldPosition.y = y;
+        cam.unproject(worldPosition);
+    }
+
+    public Vector3 transformScreenLocationToWorldLocation(float x, float y){
+        Vector3 position = new Vector3();
         worldPosition.x = x;
         worldPosition.y = y;
         cam.unproject(worldPosition);

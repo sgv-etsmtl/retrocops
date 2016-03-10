@@ -9,7 +9,6 @@ import java.util.ArrayList;
 
 import ca.etsmtl.pfe.gameobjects.BaseCharacter;
 import ca.etsmtl.pfe.gameobjects.PlayerCharacter;
-import ca.etsmtl.pfe.helper.LevelLoader;
 import ca.etsmtl.pfe.pathfinding.Node;
 import ca.etsmtl.pfe.ui.gamemenu.Menu;
 
@@ -21,20 +20,13 @@ public class GameWorld {
     private ArrayList<BaseCharacter> ennemies;
     private ArrayList<PlayerCharacter> playerCharacters;
     private boolean changeToPlayerTurnFlag;
-    private enum GameWorldState{
-        ongoing,lose,win
-    }
     private GameWorldState gameWorldState;
-
-    public PlayerCharacter getSelectedCharacter() {
-        return selectedCharacter;
-    }
-
     private PlayerCharacter selectedCharacter;
     private int selectedCharacterIndex;
     public final int DEFAULT_TILE_SIZE = 160;
     public boolean turnNeedsInit = true;
-    private int nbOfDonePlayers, nbOfDoneEnemies;
+    private int nbOfDonePlayers, nbOfDoneEnemies, nbPlayerMoving;
+    
     
     public GameWorld(GameRenderer gameRenderer,Menu menu){
         this.gameRenderer = gameRenderer;
@@ -44,10 +36,8 @@ public class GameWorld {
         gameRenderer.setCurrentMap(gameMap);
         ennemies = new ArrayList<BaseCharacter>();
         playerCharacters = new ArrayList<PlayerCharacter>(2);
-        gameWorldState = GameWorldState.ongoing;
-
-        //this is for debug
-        LevelLoader.loadLever(this, 0);
+        this.nbOfDonePlayers = 0;
+        gameWorldState = GameWorldState.waitingForAction;
         selectedCharacterIndex = -1;
     }
 
@@ -73,6 +63,11 @@ public class GameWorld {
                     nbOfDonePlayers++;
                     changeSelectedCharacter();
                 }
+            }
+            if(selectedCharacter != null &&
+                    selectedCharacter.getBaseCharacterState() == BaseCharacter.BaseCharacterState.waiting &&
+                    gameWorldState == GameWorldState.movingPlayer){
+                setGameWorldState(GameWorldState.waitingForAction);
             }
 
             if (nbOfDonePlayers >= playerCharacters.size()) {
@@ -108,7 +103,7 @@ public class GameWorld {
 
     private void postUpdateChecks() {
 
-        if (this.gameWorldState ==  GameWorldState.ongoing) {
+        if (this.gameWorldState ==  GameWorldState.waitingForAction) {
             // check if all ennemies are dead ou any pc is dead
             for (PlayerCharacter pc : this.playerCharacters) {
                 if (!pc.isAlive()) {
@@ -152,15 +147,16 @@ public class GameWorld {
         gameRenderer.tranlateCamera(x, y);
     }
 
-
     public void initPlayerTurn() {
         nbOfDonePlayers = 0;
         for (PlayerCharacter pc : playerCharacters) {
+            pc.updateTargetList();
             pc.setBaseCharacterState(BaseCharacter.BaseCharacterState.waiting);
             pc.setCurrentActionPoints(pc.getACTION_POINTS_LIMIT());
             pc.setIsDone(false);
         }
         this.turnNeedsInit = false;
+        this.gameWorldState = GameWorldState.waitingForAction;
 
     }
 
@@ -168,14 +164,37 @@ public class GameWorld {
     public void initEnemyTurn() {
         nbOfDoneEnemies = 0;
         for (BaseCharacter enemy : ennemies) {
+            enemy.updateTargetList();
             enemy.setBaseCharacterState(BaseCharacter.BaseCharacterState.waiting);
             enemy.setCurrentActionPoints(enemy.getACTION_POINTS_LIMIT());
             enemy.setIsDone(false);
         }
         this.turnNeedsInit = false;
+        this.gameWorldState = GameWorldState.waitingForAction;
     }
 
-    public void changeCharacterPosition(float screenX, float screenY){
+
+    public void handleTapScreen(float screenX, float screenY){
+        switch (gameWorldState){
+            case waitingForAction:
+                changeCharacterPosition(screenX, screenY);
+                break;
+            case usingItem:
+                useItem(screenX, screenY);
+                break;
+        }
+    }
+
+    public void setLastScreenPositionClick(float screenX, float screenY){
+        //for debug info
+        gameRenderer.setLastScreenPositionClick(screenX, screenY);
+    }
+
+    public PlayerCharacter getSelectedCharacter() {
+        return selectedCharacter;
+    }
+
+    private void changeCharacterPosition(float screenX, float screenY){
         if(!isPositionPixelInMenu(screenX,screenY) && selectedCharacter != null &&
                 selectedCharacter.getBaseCharacterState() == BaseCharacter.BaseCharacterState.waiting) {
             Vector3 end = getWorldPositionFromScreenPosition(screenX, screenY);
@@ -188,6 +207,32 @@ public class GameWorld {
                     gameMap.unblockCell(startNode.getTilePixelX(), startNode.getTilePixelY());
                     gameMap.blockCell(endNode.getTilePixelX(), endNode.getTilePixelY());
                     selectedCharacter.setPathToWalk(path);
+                }
+                setGameWorldState(GameWorldState.movingPlayer);
+            }
+        }
+    }
+
+    private void useItem(float screenX, float screenY){
+        Vector3 positionClick = getWorldPositionFromScreenPosition(screenX, screenY);
+        int tileXClick = (int) (positionClick.x / gameMap.getMapTilePixelWidth());
+        int tileYClick = (int) (positionClick.y / gameMap.getMapTilePixelHeigth());
+        int ennemyTileX;
+        int ennemyTileY;
+        if(selectedCharacter != null) {
+            for (BaseCharacter ennemy : selectedCharacter.getTargetList()){
+                ennemyTileX = (int) (ennemy.getPosition().x / gameMap.getMapTilePixelWidth());
+                ennemyTileY = (int) (ennemy.getPosition().y / gameMap.getMapTilePixelHeigth());
+                if(ennemyTileX == tileXClick && ennemyTileY == tileYClick){
+                    selectedCharacter.attack(ennemy);
+                    if(!ennemy.isAlive()){
+                        ennemies.remove(ennemy);
+                        gameRenderer.removeCharacterToDraw(ennemy);
+                    }
+                    setGameWorldState(GameWorldState.waitingForAction);
+                    menu.resetTextUseButton();
+                    updateItemMenuInfo();
+                    break;
                 }
             }
         }
@@ -206,7 +251,7 @@ public class GameWorld {
     }
 
     public Vector3 getWorldPositionFromScreenPosition(float screenX, float screenY){
-        return gameRenderer.transformScreenLocationToWorldLocation(screenX,screenY);
+        return gameRenderer.transformScreenLocationToWorldLocation(screenX, screenY);
     }
 
     public boolean isPositionPixelInMenu(float screenX, float screenY){
@@ -225,9 +270,31 @@ public class GameWorld {
         return gameMap;
     }
 
-    public void addCharacterPlayer(PlayerCharacter player){
+    public GameWorldState getGameWorldState() {
+        return gameWorldState;
+    }
 
+    public void setGameWorldState(GameWorldState gameWorldState) {
+        this.gameWorldState = gameWorldState;
+        if(gameWorldState == GameWorldState.waitingForAction){
+            if(selectedCharacter != null) {
+                for (BaseCharacter ennemy : selectedCharacter.getTargetList()){
+                    ennemy.unHighlightCharacter();
+                }
+            }
+        }
+        else if(gameWorldState == GameWorldState.usingItem){
+            if(selectedCharacter != null) {
+                for (BaseCharacter ennemy : selectedCharacter.getTargetList()){
+                    ennemy.highlightCharacterForAttack();
+                }
+            }
+        }
+    }
+
+    public void addCharacterPlayer(PlayerCharacter player){
         playerCharacters.add(player);
+        //For debug
         gameRenderer.addCharacterToDraw(player);
         gameMap.blockCell(player.getPosition().x, player.getPosition().y);
     }
@@ -254,15 +321,33 @@ public class GameWorld {
     }
 
     public void changeSelectedCharacter(){
-        if(playerCharacters != null) {
+        if(playerCharacters != null && gameWorldState == GameWorldState.waitingForAction) {
             if (selectedCharacter == null || selectedCharacter.getBaseCharacterState() == BaseCharacter.BaseCharacterState.waiting) {
+                if(selectedCharacter != null) {
+                    selectedCharacter.unHighlightCharacter();
+                }
                 selectedCharacterIndex = (selectedCharacterIndex + 1) % playerCharacters.size();
                 selectedCharacter = playerCharacters.get(selectedCharacterIndex);
                 //change camera lookAt
                 gameRenderer.lookAtPlayer(selectedCharacter.getPosition());
+                selectedCharacter.highlightSelectedCharacter();
+                updateItemMenuInfo();
             }
         }
     }
+
+    public void updateItemMenuInfo(){
+        if(selectedCharacter != null) {
+            menu.updateItemMenuInfo(selectedCharacter.getItemCharacter());
+        }
+    }
+
+    public ArrayList<BaseCharacter> getEnnemies() {
+        return ennemies;
+    }
+
+    public enum GameWorldState {
+        usingItem,movingPlayer, waitingForAction, lose, win   }
 
     public ArrayList<PlayerCharacter> getPlayerCharacters() {
         return playerCharacters;

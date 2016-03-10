@@ -8,18 +8,20 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import ca.etsmtl.pfe.gameobjects.BaseCharacter;
+import ca.etsmtl.pfe.gameobjects.items.Item;
 import ca.etsmtl.pfe.gameworld.GameWorld;
 
 public class MenuClickListenerHandler extends ClickListener {
 
     private ImageButton switchButton;
-    private TextButton itemButton, useButton, overwatchButton, optionsButton;
+    private ItemMenuButton itemButton;
+    private TextButton useButton, overwatchButton, optionsButton;
     private GameWorld gameWorld;
 
     public MenuClickListenerHandler() {
     }
 
-    public MenuClickListenerHandler(ImageButton switchButton, TextButton itemButton,
+    public MenuClickListenerHandler(ImageButton switchButton, ItemMenuButton itemButton,
                                     TextButton useButton, TextButton overwatchButton,
                                     TextButton optionsButton,
                                     GameWorld gameWorld) {
@@ -48,11 +50,11 @@ public class MenuClickListenerHandler extends ClickListener {
         this.switchButton = switchButton;
     }
 
-    public TextButton getItemButton() {
+    public ItemMenuButton getItemButton() {
         return itemButton;
     }
 
-    public void setItemButton(TextButton itemButton) {
+    public void setItemButton(ItemMenuButton itemButton) {
         this.itemButton = itemButton;
     }
 
@@ -106,16 +108,31 @@ public class MenuClickListenerHandler extends ClickListener {
     }
 
     private void handleItemClick(){
+        if(gameWorld.getSelectedCharacter() != null &&
+                gameWorld.getGameWorldState() == GameWorld.GameWorldState.waitingForAction){
 
+            gameWorld.getSelectedCharacter().reloadItem();
+            Item currentItemUse = gameWorld.getSelectedCharacter().getItemCharacter();
+            itemButton.updateInfoAmmo(currentItemUse.getTotalAmmo(),
+                    currentItemUse.getCurrentClipAmmo(), currentItemUse.getMaxAmmoByClip());
+        }
     }
 
     private void handleUseClick(){
-
+        if(gameWorld.getGameWorldState() == GameWorld.GameWorldState.waitingForAction){
+            getGameWorld().setGameWorldState(GameWorld.GameWorldState.usingItem);
+            this.useButton.setText("CANCEL");
+        }
+        else if(gameWorld.getGameWorldState() == GameWorld.GameWorldState.usingItem){
+            getGameWorld().setGameWorldState(GameWorld.GameWorldState.waitingForAction);
+            this.useButton.setText("USE");
+        }
     }
 
     private void handleOverwatchClick(){
         if(gameWorld != null && gameWorld.getSelectedCharacter() != null
-                && gameWorld.getSelectedCharacter().getBaseCharacterState() == BaseCharacter.BaseCharacterState.waiting) {
+                && gameWorld.getSelectedCharacter().getBaseCharacterState() == BaseCharacter.BaseCharacterState.waiting
+                && gameWorld.getGameWorldState() == GameWorld.GameWorldState.waitingForAction) {
 
             gameWorld.getSelectedCharacter().setBaseCharacterState(BaseCharacter.BaseCharacterState.overwatch);
             Gdx.app.log("info", "OW BUTTON PRESSED");

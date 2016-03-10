@@ -6,10 +6,13 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.compression.lzma.Base;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import ca.etsmtl.pfe.gameobjects.items.Item;
+import ca.etsmtl.pfe.gameobjects.items.Pistol;
 import ca.etsmtl.pfe.gameworld.GameWorld;
 import ca.etsmtl.pfe.pathfinding.Node;
 
@@ -31,8 +34,8 @@ public abstract class BaseCharacter {
     protected boolean isDone;
     protected GameWorld gameWorld;
     /* FIN DU CODE EMPRUNTÉ */
-
-
+    protected Item itemCharacter;
+    
     public int getACTION_POINTS_LIMIT() {
         return ACTION_POINTS_LIMIT;
     }
@@ -40,18 +43,25 @@ public abstract class BaseCharacter {
     protected final int ACTION_POINTS_LIMIT = 2;
     protected int currentActionPoints = 0;
     protected final int HIT_POINTS_LIMIT = 2;
-    protected int currentHitPoints = 2;
-
+    protected int currentHitPoints;
 
     protected boolean isAlive;
     Sprite spriteCharacter;
 
     protected DefaultGraphPath<Node> pathToWalk;
 
-    protected Node currentNode;
     protected Node nextPosition;
 
     protected BaseCharacterState baseCharacterState;
+    
+    protected boolean isHighlight;
+
+    protected boolean isHighlightForAttack;
+
+    protected Color colorOfHighlightForSelected;
+    protected Color colorOfHighlightForAttack;
+
+    protected List<BaseCharacter> targetList;
 
     public BaseCharacter(GameWorld gameWorld){
         this.gameWorld = gameWorld;
@@ -71,6 +81,12 @@ public abstract class BaseCharacter {
         isAlive = true;
         speed = 900;
         baseCharacterState = BaseCharacterState.waiting;
+        currentHitPoints = HIT_POINTS_LIMIT;
+        itemCharacter = new Pistol(50,10,20);
+        itemCharacter.setOwner(this);
+        colorOfHighlightForSelected = new Color(0,1,0,0.5f);
+        colorOfHighlightForAttack = new Color(1,0,0,0.5f);
+        targetList = new ArrayList<BaseCharacter>();
     }
 
     public Vector2 getPosition() {
@@ -138,21 +154,54 @@ public abstract class BaseCharacter {
         return baseCharacterState;
     }
 
+    public Item getItemCharacter() {
+        return itemCharacter;
+    }
+
+    public void setItemCharacter(Item itemCharacter) {
+        this.itemCharacter = itemCharacter;
+        if(itemCharacter != null){
+            this.itemCharacter.setOwner(this);
+        }
+    }
+
     public void draw(SpriteBatch batch){
         if(spriteCharacter != null && isAlive){
             spriteCharacter.draw(batch);
         }
     }
 
+    public void drawHighlight(ShapeRenderer shapeRenderer){
+        if(isHighlight && spriteCharacter != null && isAlive){
+            Color currentColor = shapeRenderer.getColor();
+            if(isHighlightForAttack){
+                shapeRenderer.setColor(colorOfHighlightForAttack);
+            }
+            else {
+                shapeRenderer.setColor(colorOfHighlightForSelected);
+            }
+            shapeRenderer.setColor(currentColor);
+            shapeRenderer.rect(position.x, position.y, spriteCharacter.getWidth(), spriteCharacter.getHeight());
+        }
+    }
+
+    public List<BaseCharacter> getTargetList() {
+        return targetList;
+    }
+
+    public void setTargetList(List<BaseCharacter> targetList) {
+        this.targetList = targetList;
+    }
+
     /*
-    CODE EMPRUNTÉ :
-       Les lignes suivantes sont basées sur la classe
-       provenant du site :
-      https://bitbucket.org/dermetfan/somelibgdxtests/src/8f2d5d953c42c9c1f52ce588a4abfa450995480e/src/net/dermetfan/someLibgdxTests/entities/AISprite.java?at=default&fileviewer=file-view-default
-      J'ai pris la méthode update qui calcule la prochaine position du personnage entre sa position actuel et la position qu'il doit atteindre
-      dépendement du nombre de seconde qui se sont écoulé depuis le dernier frame.
-      Je l'ai modifier pour utiliser une liste de noeud (fait par le path finding) au lieu du liste de vecteur
-    */
+        CODE EMPRUNTÉ :
+           Les lignes suivantes sont basées sur la classe
+           provenant du site :
+          https://bitbucket.org/dermetfan/somelibgdxtests/src/8f2d5d953c42c9c1f52ce588a4abfa450995480e/src/net/dermetfan/someLibgdxTests/entities/AISprite.java?at=default&fileviewer=file-view-default
+          J'ai pris la méthode update qui calcule la prochaine position du personnage entre sa position actuel et la position qu'il doit atteindre
+          dépendement du nombre de seconde qui se sont écoulé depuis le dernier frame.
+          Je l'ai modifier pour utiliser une liste de noeud (fait par le path finding) au lieu du liste de vecteur
+        */
     public void update(float delta){
         if(pathToWalk != null && baseCharacterState == BaseCharacterState.moving) {
             nextPosition = pathToWalk.get(waypoint);
@@ -272,7 +321,7 @@ public abstract class BaseCharacter {
             }
         }
     }
-    /* FIN DU CODE EMPRUNTÉ */
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -281,27 +330,21 @@ public abstract class BaseCharacter {
         BaseCharacter that = (BaseCharacter) o;
 
         return Float.compare(that.speed, speed)==0 && isAlive==that.isAlive && waypoint==that.waypoint
+                && isDone == that.isDone && currentActionPoints == that.currentActionPoints
+                && currentHitPoints == that.currentHitPoints && isHighlight == that.isHighlight
+                && isHighlightForAttack == that.isHighlightForAttack
+                && !(itemCharacter != null ? !itemCharacter.equals(that.itemCharacter) : that.itemCharacter != null)
                 && !(position != null ? !position.equals(that.position) : that.position != null) &&
                 !(velocity != null ? !velocity.equals(that.velocity) : that.velocity != null) &&
                 !(spriteCharacter != null ? !spriteCharacter.equals(that.spriteCharacter) : that.spriteCharacter != null)
                 && !(pathToWalk != null ? !pathToWalk.equals(that.pathToWalk) : that.pathToWalk != null)
-                && !(nextPosition != null ? !nextPosition.equals(that.nextPosition) : that.nextPosition != null) &&
-                baseCharacterState == that.baseCharacterState;
+                && !(nextPosition != null ? !nextPosition.equals(that.nextPosition) : that.nextPosition != null)
+                && ! (colorOfHighlightForSelected != null ? !colorOfHighlightForSelected.equals(that.colorOfHighlightForSelected) : that.colorOfHighlightForSelected != null)
+                && !(colorOfHighlightForAttack != null ? !colorOfHighlightForAttack.equals(that.colorOfHighlightForAttack) : that.colorOfHighlightForAttack != null)
+                && baseCharacterState == that.baseCharacterState
+                && !(targetList != null ? !targetList.equals(that.targetList) : that.targetList != null);
     }
 
-    @Override
-    public int hashCode() {
-        int result = position != null ? position.hashCode() : 0;
-        result = 31 * result + (velocity != null ? velocity.hashCode() : 0);
-        result = 31 * result + (speed != +0.0f ? Float.floatToIntBits(speed) : 0);
-        result = 31 * result + waypoint;
-        result = 31 * result + (isAlive ? 1 : 0);
-        result = 31 * result + (spriteCharacter != null ? spriteCharacter.hashCode() : 0);
-        result = 31 * result + (pathToWalk != null ? pathToWalk.hashCode() : 0);
-        result = 31 * result + (nextPosition != null ? nextPosition.hashCode() : 0);
-        result = 31 * result + (baseCharacterState != null ? baseCharacterState.hashCode() : 0);
-        return result;
-    }
 
     public int getCurrentActionPoints() {
         return currentActionPoints;
@@ -338,6 +381,46 @@ public abstract class BaseCharacter {
         Gdx.app.log("info", this + "has used overwatch");
     }
 
+    public void characterGetHit(int damagePoint){
+        currentHitPoints -= damagePoint;
+        if (currentHitPoints <= 0){
+            isAlive = false;
+        }
+    }
+
+    public void reloadItem(){
+        if(currentActionPoints > 0 && itemCharacter.isReloadable()){
+            if(itemCharacter.reload()){
+                this.currentActionPoints--;
+            }
+        }
+    }
+
+    public void highlightSelectedCharacter(){
+        isHighlight = true;
+        isHighlightForAttack = false;
+    }
+
+    public void highlightSelectedCharacter(Color colorOfHighlight){
+        this.colorOfHighlightForSelected = colorOfHighlight;
+        highlightSelectedCharacter();
+    }
+
+    public void highlightCharacterForAttack(){
+        isHighlight = true;
+        isHighlightForAttack = true;
+    }
+
+    public void highlightCharacterForAttack(Color colorOfHighlight){
+        this.colorOfHighlightForAttack = colorOfHighlight;
+        highlightCharacterForAttack();
+    }
+
+    public void unHighlightCharacter(){
+        isHighlight = false;
+        isHighlightForAttack = false;
+    }
+
     public Node getCurrentNode() {
         //return this.currentNode;
         return this.gameWorld.getGameMap().getMapGraph()
@@ -348,14 +431,14 @@ public abstract class BaseCharacter {
 
     public void attack(BaseCharacter chosenTarget) {
 
-        chosenTarget.setCurrentHitPoints(chosenTarget.getCurrentHitPoints() - 1);
         this.currentActionPoints = 0;
 
         if(chosenTarget.currentHitPoints <= 0) {
             chosenTarget.isAlive = false;
         }
-        Gdx.app.log("info", this + " is attacking " + chosenTarget);
-        Gdx.app.log("info", chosenTarget + " has " + chosenTarget.getCurrentHitPoints() + " HP left");
+        //Gdx.app.log("info", this + " is attacking " + chosenTarget);
+        //Gdx.app.log("info", chosenTarget + " has " + chosenTarget.getCurrentHitPoints() + " HP left");
+        updateTargetList();
     }
 
     public enum BaseCharacterState {
