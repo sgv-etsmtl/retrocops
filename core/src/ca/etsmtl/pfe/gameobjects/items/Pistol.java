@@ -5,9 +5,9 @@ import ca.etsmtl.pfe.gameobjects.BaseCharacter;
 import ca.etsmtl.pfe.pathfinding.Node;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-public class Pistole extends Item {
+public class Pistol extends Item {
 
-    public Pistole(int totalAmmo,int currentClipAmmo, int maxAmmoByClip) {
+    public Pistol(int totalAmmo, int currentClipAmmo, int maxAmmoByClip) {
         super(true, false, totalAmmo, currentClipAmmo, maxAmmoByClip);
     }
 
@@ -15,7 +15,7 @@ public class Pistole extends Item {
     public boolean attack(BaseCharacter characterToAttack) {
         if(currentClipAmmo > 0) {
             currentClipAmmo -= 1;
-            characterToAttack.characterGetIt(1);
+            characterToAttack.characterGetHit(1);
         }
         return true;
     }

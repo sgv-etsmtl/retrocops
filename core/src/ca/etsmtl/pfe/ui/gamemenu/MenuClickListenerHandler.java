@@ -109,7 +109,7 @@ public class MenuClickListenerHandler extends ClickListener {
 
     private void handleItemClick(){
         if(gameWorld.getSelectedCharacter() != null &&
-                gameWorld.getGameWorldState() == GameWorld.GameWorldState.waitngForAction){
+                gameWorld.getGameWorldState() == GameWorld.GameWorldState.waitingForAction){
 
             gameWorld.getSelectedCharacter().reloadItem();
             Item currentItemUse = gameWorld.getSelectedCharacter().getItemCharacter();
@@ -119,12 +119,12 @@ public class MenuClickListenerHandler extends ClickListener {
     }
 
     private void handleUseClick(){
-        if(gameWorld.getGameWorldState() == GameWorld.GameWorldState.waitngForAction){
+        if(gameWorld.getGameWorldState() == GameWorld.GameWorldState.waitingForAction){
             getGameWorld().setGameWorldState(GameWorld.GameWorldState.usingItem);
             this.useButton.setText("CANCEL");
         }
         else if(gameWorld.getGameWorldState() == GameWorld.GameWorldState.usingItem){
-            getGameWorld().setGameWorldState(GameWorld.GameWorldState.waitngForAction);
+            getGameWorld().setGameWorldState(GameWorld.GameWorldState.waitingForAction);
             this.useButton.setText("USE");
         }
     }
@@ -132,7 +132,7 @@ public class MenuClickListenerHandler extends ClickListener {
     private void handleOverwatchClick(){
         if(gameWorld != null && gameWorld.getSelectedCharacter() != null
                 && gameWorld.getSelectedCharacter().getBaseCharacterState() == BaseCharacter.BaseCharacterState.waiting
-                && gameWorld.getGameWorldState() == GameWorld.GameWorldState.waitngForAction) {
+                && gameWorld.getGameWorldState() == GameWorld.GameWorldState.waitingForAction) {
 
             gameWorld.getSelectedCharacter().setBaseCharacterState(BaseCharacter.BaseCharacterState.overwatch);
             Gdx.app.log("info", "OW BUTTON PRESSED");

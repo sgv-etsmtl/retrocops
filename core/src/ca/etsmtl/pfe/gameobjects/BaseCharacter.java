@@ -6,14 +6,13 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.compression.lzma.Base;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ca.etsmtl.pfe.gameobjects.items.Item;
-import ca.etsmtl.pfe.gameobjects.items.Pistole;
+import ca.etsmtl.pfe.gameobjects.items.Pistol;
 import ca.etsmtl.pfe.gameworld.GameWorld;
 import ca.etsmtl.pfe.pathfinding.Node;
 
@@ -44,19 +43,16 @@ public abstract class BaseCharacter {
     protected final int ACTION_POINTS_LIMIT = 2;
     protected int currentActionPoints = 0;
     protected final int HIT_POINTS_LIMIT = 2;
-    protected int currentHitPoints = 2;
+    protected int currentHitPoints;
 
     protected boolean isAlive;
     Sprite spriteCharacter;
 
     protected DefaultGraphPath<Node> pathToWalk;
 
-    protected Node currentNode;
     protected Node nextPosition;
 
     protected BaseCharacterState baseCharacterState;
-
-    protected int currentLivePoint;
     
     protected boolean isHighlight;
 
@@ -65,12 +61,8 @@ public abstract class BaseCharacter {
     protected Color colorOfHighlightForSelected;
     protected Color colorOfHighlightForAttack;
 
-    protected List<BaseCharacter> tagetPossibleList;
+    protected List<BaseCharacter> targetList;
 
-    public BaseCharacter() {
-        initializeVariable();
-    }
-    
     public BaseCharacter(GameWorld gameWorld){
         this.gameWorld = gameWorld;
         initializeVariable();
@@ -89,11 +81,12 @@ public abstract class BaseCharacter {
         isAlive = true;
         speed = 900;
         baseCharacterState = BaseCharacterState.waiting;
-        currentLivePoint = 3;
-        itemCharacter = new Pistole(50,10,20);
+        currentHitPoints = HIT_POINTS_LIMIT;
+        itemCharacter = new Pistol(50,10,20);
         itemCharacter.setOwner(this);
         colorOfHighlightForSelected = new Color(0,1,0,0.5f);
         colorOfHighlightForAttack = new Color(1,0,0,0.5f);
+        targetList = new ArrayList<BaseCharacter>();
     }
 
     public Vector2 getPosition() {
@@ -161,14 +154,6 @@ public abstract class BaseCharacter {
         return baseCharacterState;
     }
 
-    public int getCurrentLivePoint() {
-        return currentLivePoint;
-    }
-
-    public void setCurrentLivePoint(int currentLivePoint) {
-        this.currentLivePoint = currentLivePoint;
-    }
-
     public Item getItemCharacter() {
         return itemCharacter;
     }
@@ -200,12 +185,12 @@ public abstract class BaseCharacter {
         }
     }
 
-    public List<BaseCharacter> getTagetPossibleList() {
-        return tagetPossibleList;
+    public List<BaseCharacter> getTargetList() {
+        return targetList;
     }
 
-    public void setTagetPossibleList(List<BaseCharacter> tagetPossibleList) {
-        this.tagetPossibleList = tagetPossibleList;
+    public void setTargetList(List<BaseCharacter> targetList) {
+        this.targetList = targetList;
     }
 
     /*
@@ -346,7 +331,7 @@ public abstract class BaseCharacter {
 
         return Float.compare(that.speed, speed)==0 && isAlive==that.isAlive && waypoint==that.waypoint
                 && isDone == that.isDone && currentActionPoints == that.currentActionPoints
-                && currentLivePoint == that.currentLivePoint && isHighlight == that.isHighlight
+                && currentHitPoints == that.currentHitPoints && isHighlight == that.isHighlight
                 && isHighlightForAttack == that.isHighlightForAttack
                 && !(itemCharacter != null ? !itemCharacter.equals(that.itemCharacter) : that.itemCharacter != null)
                 && !(position != null ? !position.equals(that.position) : that.position != null) &&
@@ -357,32 +342,9 @@ public abstract class BaseCharacter {
                 && ! (colorOfHighlightForSelected != null ? !colorOfHighlightForSelected.equals(that.colorOfHighlightForSelected) : that.colorOfHighlightForSelected != null)
                 && !(colorOfHighlightForAttack != null ? !colorOfHighlightForAttack.equals(that.colorOfHighlightForAttack) : that.colorOfHighlightForAttack != null)
                 && baseCharacterState == that.baseCharacterState
-                && !(tagetPossibleList != null ? !tagetPossibleList.equals(that.tagetPossibleList) : that.tagetPossibleList != null);
+                && !(targetList != null ? !targetList.equals(that.targetList) : that.targetList != null);
     }
 
-    @Override
-    public int hashCode() {
-        int result = position != null ? position.hashCode() : 0;
-        result = 31 * result + (velocity != null ? velocity.hashCode() : 0);
-        result = 31 * result + (speed != +0.0f ? Float.floatToIntBits(speed) : 0);
-        result = 31 * result + waypoint;
-        result = 31 * result + (isDone ? 1 : 0);
-        result = 31 * result + (itemCharacter != null ? itemCharacter.hashCode() : 0);
-        result = 31 * result + ACTION_POINTS_LIMIT;
-        result = 31 * result + currentActionPoints;
-        result = 31 * result + (isAlive ? 1 : 0);
-        result = 31 * result + (spriteCharacter != null ? spriteCharacter.hashCode() : 0);
-        result = 31 * result + (pathToWalk != null ? pathToWalk.hashCode() : 0);
-        result = 31 * result + (nextPosition != null ? nextPosition.hashCode() : 0);
-        result = 31 * result + (baseCharacterState != null ? baseCharacterState.hashCode() : 0);
-        result = 31 * result + currentLivePoint;
-        result = 31 * result + (isHighlight ? 1 : 0);
-        result = 31 * result + (isHighlightForAttack ? 1 : 0);
-        result = 31 * result + (colorOfHighlightForSelected != null ? colorOfHighlightForSelected.hashCode() : 0);
-        result = 31 * result + (colorOfHighlightForAttack != null ? colorOfHighlightForAttack.hashCode() : 0);
-        result = 31 * result + (tagetPossibleList != null ? tagetPossibleList.hashCode() : 0);
-        return result;
-    }
 
     public int getCurrentActionPoints() {
         return currentActionPoints;
@@ -419,9 +381,9 @@ public abstract class BaseCharacter {
         Gdx.app.log("info", this + "has used overwatch");
     }
 
-    public void characterGetIt(int damagePoint){
-        currentLivePoint -= damagePoint;
-        if (currentLivePoint <= 0){
+    public void characterGetHit(int damagePoint){
+        currentHitPoints -= damagePoint;
+        if (currentHitPoints <= 0){
             isAlive = false;
         }
     }
@@ -469,15 +431,14 @@ public abstract class BaseCharacter {
 
     public void attack(BaseCharacter chosenTarget) {
 
-        chosenTarget.setCurrentHitPoints(chosenTarget.getCurrentHitPoints() - 1);
-
         this.currentActionPoints = 0;
 
         if(chosenTarget.currentHitPoints <= 0) {
             chosenTarget.isAlive = false;
         }
-        Gdx.app.log("info", this + " is attacking " + chosenTarget);
-        Gdx.app.log("info", chosenTarget + " has " + chosenTarget.getCurrentHitPoints() + " HP left");
+        //Gdx.app.log("info", this + " is attacking " + chosenTarget);
+        //Gdx.app.log("info", chosenTarget + " has " + chosenTarget.getCurrentHitPoints() + " HP left");
+        updateTargetList();
     }
 
     public enum BaseCharacterState {
