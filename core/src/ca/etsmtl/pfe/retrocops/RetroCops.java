@@ -1,9 +1,11 @@
 package ca.etsmtl.pfe.retrocops;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Screen;
 
 import ca.etsmtl.pfe.helper.AssetLoader;
 import ca.etsmtl.pfe.helper.LevelLoader;
+import ca.etsmtl.pfe.screens.GameOverScreen;
 import ca.etsmtl.pfe.screens.GameScreen;
 import ca.etsmtl.pfe.screens.LevelSelectScreen;
 import ca.etsmtl.pfe.screens.MainMenu;
@@ -14,7 +16,8 @@ public class RetroCops extends Game {
 	private MainMenu mainMenuScreen;
 	private GameScreen gameScreen;
 	private LevelSelectScreen levelSelectScreen;
-	
+	private GameOverScreen gameOverScreen;
+
 	@Override
 	public void create () {
 		AssetLoader.load();
@@ -22,6 +25,7 @@ public class RetroCops extends Game {
 		mainMenuScreen = new MainMenu(1920, 1080, this);
 		gameScreen =  new GameScreen(1920, 1080, this);
 		levelSelectScreen = new LevelSelectScreen(1920, 1080, this);
+		gameOverScreen = new GameOverScreen(1920, 1080, this);
 		changeScreenToMainMenu();
 	}
 
@@ -32,11 +36,17 @@ public class RetroCops extends Game {
 		mainMenuScreen.dispose();
 		gameScreen.dispose();
 		levelSelectScreen.dispose();
+		gameOverScreen.dispose();
 	}
 
 	public void changeScreenToMainMenu(){
 		mainMenuScreen.changeInputToMainMenuScreen();
 		setScreen(mainMenuScreen);
+	}
+
+	public void changeScreenToGameOverScreen() {
+		gameOverScreen.changeInputToGameOverScreen();
+		setScreen(gameOverScreen);
 	}
 
 	public void changeScreenToGameScreen(){

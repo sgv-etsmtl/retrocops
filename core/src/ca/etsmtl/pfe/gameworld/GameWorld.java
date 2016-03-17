@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import ca.etsmtl.pfe.gameobjects.BaseCharacter;
 import ca.etsmtl.pfe.gameobjects.PlayerCharacter;
 import ca.etsmtl.pfe.pathfinding.Node;
+import ca.etsmtl.pfe.screens.GameScreen;
 import ca.etsmtl.pfe.ui.gamemenu.Menu;
 
 public class GameWorld {
@@ -26,11 +27,13 @@ public class GameWorld {
     public final int DEFAULT_TILE_SIZE = 160;
     public boolean turnNeedsInit = true;
     private int nbOfDonePlayers, nbOfDoneEnemies, nbPlayerMoving;
+    private GameScreen gameScreen;
     
     
-    public GameWorld(GameRenderer gameRenderer,Menu menu){
+    public GameWorld(GameRenderer gameRenderer,Menu menu, GameScreen gameScreen){
         this.gameRenderer = gameRenderer;
         this.menu = menu;
+        this.gameScreen = gameScreen;
         this.changeToPlayerTurnFlag = true;
         gameMap = new GameMap();
         gameRenderer.setCurrentMap(gameMap);
@@ -134,12 +137,12 @@ public class GameWorld {
 
     private void triggerWin() {
         Gdx.app.log("info", "YOU WIN' YOU CRAZY KILLER");
-
+        this.gameScreen.getCurrentGame().changeScreenToGameOverScreen();
     }
 
     private void triggerGameOver() {
         Gdx.app.log("info", "GG YOU DEAD");
-
+        this.gameScreen.getCurrentGame().changeScreenToGameOverScreen();
 
     }
 
@@ -306,12 +309,17 @@ public class GameWorld {
     }
 
     public void clearWorld(){
+        gameWorldState = GameWorldState.waitingForAction;
         selectedCharacter = null;
         selectedCharacterIndex = -1;
         playerCharacters.clear();
         ennemies.clear();
         gameRenderer.deleteAllCharacterToDraw();
         gameRenderer.resetCamera();
+        changeToPlayerTurnFlag = true;
+        turnNeedsInit = true;
+        nbOfDoneEnemies = 0;
+        nbOfDonePlayers = 0;
     }
 
     public void changeMap(String newMapFilePath){
