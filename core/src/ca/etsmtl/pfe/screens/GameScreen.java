@@ -24,7 +24,7 @@ public class GameScreen implements Screen {
     public GameScreen(float width, float heigth, RetroCops currentGame){
         gameMenu = new Menu(width,heigth);
         gameRenderer = new GameRenderer(width,heigth);
-        gameWorld = new GameWorld(gameRenderer,gameMenu);
+        gameWorld = new GameWorld(gameRenderer,gameMenu, this);
         gameRenderer.setMenu(gameMenu);
         gameMenu.setGameWorld(gameWorld);
         this.currentGame = currentGame;
@@ -79,5 +79,9 @@ public class GameScreen implements Screen {
     public void dispose() {
         gameRenderer.dispose();
         gameMenu.dispose();
+    }
+
+    public RetroCops getCurrentGame() {
+        return currentGame;
     }
 }
