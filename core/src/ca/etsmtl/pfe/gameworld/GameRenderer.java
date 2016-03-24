@@ -11,6 +11,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 
+import java.awt.Shape;
+import java.util.ArrayList;
+
 import ca.etsmtl.pfe.gameobjects.BaseCharacter;
 import ca.etsmtl.pfe.helper.AssetLoader;
 import ca.etsmtl.pfe.ui.gamemenu.Menu;
@@ -26,6 +29,7 @@ public class GameRenderer {
     private SpriteBatch batcher;
     private SpriteBatch characterBatcher;
     private Vector3 worldPosition;
+    private ArrayList<String> gameLogMessages;
 
     private float leftboundary;
     private float rigthboundary;
@@ -33,8 +37,10 @@ public class GameRenderer {
     private float bottomboundary;
 
     private ShapeRenderer shapeRenderer;
+    private ShapeRenderer gameLogShapeRenderer;
     private Vector3 ajustedCamPos;
     private Vector2 lastScreenPositionClick;
+    private GameLog gameLog;
 
     private Array<BaseCharacter> characterToDraw;
 
@@ -46,6 +52,9 @@ public class GameRenderer {
         cam.setToOrtho(false, viewportWidth, viewportHeight);
         shapeRenderer = new ShapeRenderer();
         shapeRenderer.setProjectionMatrix(cam.combined);
+        gameLogShapeRenderer= new ShapeRenderer();
+        gameLogShapeRenderer.setProjectionMatrix(cam.combined);
+
         batcher = new SpriteBatch();
         batcher.setProjectionMatrix(cam.combined);
         worldPosition = new Vector3(0,0,0);
@@ -60,6 +69,9 @@ public class GameRenderer {
     public void setCurrentMap(GameMap currentMap) {
         this.currentMap = currentMap;
         calculateBoundary();
+    }
+    public void setGameLog(GameLog gameLog){
+        this.gameLog = gameLog;
     }
 
     public Menu getMenu() {
@@ -97,7 +109,10 @@ public class GameRenderer {
 
         menu.drawMenu();
 
-        drawDebugInfo();
+        //drawDebugInfo();
+
+
+        gameLog.drawGameLog(batcher, gameLogShapeRenderer, writeFont);
 
 
     }
@@ -120,6 +135,10 @@ public class GameRenderer {
         writeFont.draw(batcher, "pos cam " + cam.position.x + ", " + cam.position.y, 1200, 250);
         writeFont.draw(batcher, "world click " + worldPosition.x + ", " + worldPosition.y, 1200, 400);
         batcher.end();
+    }
+
+    public void setGameLogMessages(ArrayList<String> messages){
+        this.gameLogMessages = messages;
     }
 
     private void drawCharacter(boolean drawDebug){
@@ -232,8 +251,8 @@ public class GameRenderer {
         characterBatcher.dispose();
         writeFont.dispose();
         batcher.dispose();
-        characterBatcher.dispose();
         shapeRenderer.dispose();
+        gameLogShapeRenderer.dispose();
     }
 
     public void lookAtPlayer(float playerPosX, float playerPosY){

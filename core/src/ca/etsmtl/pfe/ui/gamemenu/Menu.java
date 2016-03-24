@@ -36,6 +36,7 @@ public class Menu {
     private GameWorld gameWorld;
 
     private Vector3 lastPostionAsk;
+    private final String DEFAULT_USE_BUTTON_LABEL = "SHOOT";
 
     public Menu(float viewportWidth, float viewportHeight){
         this.viewportWidth = viewportWidth;
@@ -50,6 +51,7 @@ public class Menu {
         testButtonStyle.pressedOffsetX = 10;
         testButtonStyle.pressedOffsetY = -5;
         testButtonStyle.font = AssetLoader.gameFont;
+
 
         //new Image(new Texture(levelImagePath))
 
@@ -66,7 +68,7 @@ public class Menu {
         switchButton = new ImageButton(switchCharacterStyle);
         itemButton = new ItemMenuButton("0", "0", "0", new Button.ButtonStyle(),
                                        AssetLoader.pistolUp, AssetLoader.pistolDown);
-        useButton = new TextButton("USE", testButtonStyle);
+        useButton = new TextButton(DEFAULT_USE_BUTTON_LABEL, testButtonStyle);
         overwatchButton = new TextButton("OW", testButtonStyle);
         optionsButton = new TextButton("Options", testButtonStyle);
 
@@ -93,7 +95,7 @@ public class Menu {
         verticalTable.row();
         verticalTable.add(overwatchButton).width(BUTTON_SIZE).height(BUTTON_SIZE).pad(PADDING);
         verticalTable.row();
-        verticalTable.add(optionsButton).width(BUTTON_SIZE).height(BUTTON_SIZE);
+      //  verticalTable.add(optionsButton).width(BUTTON_SIZE).height(BUTTON_SIZE);
         switchButton.getImageCell().expand().fill();
         menuStage.addActor(verticalTable);
 
@@ -147,7 +149,7 @@ public class Menu {
     }
 
     public void resetTextUseButton(){
-        useButton.setText("USE");
+        useButton.setText(DEFAULT_USE_BUTTON_LABEL);
     }
 
     public void updateItemMenuInfo(Item item){

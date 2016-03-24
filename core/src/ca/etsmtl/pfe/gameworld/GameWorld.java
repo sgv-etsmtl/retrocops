@@ -28,8 +28,10 @@ public class GameWorld {
     public boolean turnNeedsInit = true;
     private int nbOfDonePlayers, nbOfDoneEnemies, nbPlayerMoving;
     private GameScreen gameScreen;
-    
-    
+    public GameLog gameLog;
+    private final int HUMAN_MAX_MOVEMENT_IN_TILES = 12;
+
+
     public GameWorld(GameRenderer gameRenderer,Menu menu, GameScreen gameScreen){
         this.gameRenderer = gameRenderer;
         this.menu = menu;
@@ -42,6 +44,8 @@ public class GameWorld {
         this.nbOfDonePlayers = 0;
         gameWorldState = GameWorldState.waitingForAction;
         selectedCharacterIndex = -1;
+        this.gameLog = new GameLog();
+        this.gameRenderer.setGameLog(gameLog);
     }
 
     public void update(float delta){
@@ -99,7 +103,7 @@ public class GameWorld {
                 turnNeedsInit = true;
             }
         }
-
+        this.gameRenderer.setGameLogMessages(this.gameLog.getMessages());
         postUpdateChecks();
 
     }
@@ -151,6 +155,7 @@ public class GameWorld {
     }
 
     public void initPlayerTurn() {
+        gameLog.addMessage("YOUR TURN");
         nbOfDonePlayers = 0;
         for (PlayerCharacter pc : playerCharacters) {
             pc.updateTargetList();
@@ -165,6 +170,7 @@ public class GameWorld {
 
 
     public void initEnemyTurn() {
+        gameLog.addMessage("ENEMY'S TURN");
         nbOfDoneEnemies = 0;
         for (BaseCharacter enemy : ennemies) {
             enemy.updateTargetList();
@@ -203,7 +209,7 @@ public class GameWorld {
             Vector3 end = getWorldPositionFromScreenPosition(screenX, screenY);
             Vector2 start = selectedCharacter.getPosition();
             DefaultGraphPath<Node> path = gameMap.getPath(start.x, start.y, end.x, end.y);
-            if(path != null && path.nodes.size > 0){
+            if(path != null && path.nodes.size > 0 && path.nodes.size <= HUMAN_MAX_MOVEMENT_IN_TILES){
                 Node startNode = path.get(0);
                 Node endNode = path.get(path.nodes.size - 1);
                 if(!startNode.equals(endNode)) {
@@ -320,6 +326,7 @@ public class GameWorld {
         turnNeedsInit = true;
         nbOfDoneEnemies = 0;
         nbOfDonePlayers = 0;
+        gameLog.clearLog();
     }
 
     public void changeMap(String newMapFilePath){

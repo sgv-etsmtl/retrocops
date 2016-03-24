@@ -36,10 +36,18 @@ public class PlayerCharacter extends BaseCharacter{
 
         if(this.getItemCharacter().attack(target)) {
 
+            gameWorld.gameLog.addMessage("You attack Goon for 1");
             super.attack(target);
 
         } else {
             this.setCurrentActionPoints(0);
         }
+
+    }
+
+    @Override
+    public void useOverwatch() {
+        super.useOverwatch();
+        gameWorld.gameLog.addMessage("You used overwatch");
     }
 }

@@ -221,6 +221,7 @@ public abstract class BaseCharacter {
                         baseCharacterState = BaseCharacterState.waiting;
                         this.currentActionPoints--;
                         updateTargetList();
+                        this.pathToWalk.clear();
                     }
                 }
             }
@@ -378,7 +379,6 @@ public abstract class BaseCharacter {
     public void useOverwatch() {
         this.baseCharacterState = baseCharacterState.overwatch;
         setCurrentActionPoints(0);
-        Gdx.app.log("info", this + "has used overwatch");
     }
 
     public void characterGetHit(int damagePoint){
@@ -394,6 +394,7 @@ public abstract class BaseCharacter {
                 this.currentActionPoints--;
             }
         }
+        this.gameWorld.gameLog.addMessage("Weapon Reloaded");
     }
 
     public void highlightSelectedCharacter(){
@@ -435,10 +436,17 @@ public abstract class BaseCharacter {
 
         if(chosenTarget.currentHitPoints <= 0) {
             chosenTarget.isAlive = false;
+            gameWorld.gameLog.addMessage("Kill Confirmed");
         }
+
         //Gdx.app.log("info", this + " is attacking " + chosenTarget);
         //Gdx.app.log("info", chosenTarget + " has " + chosenTarget.getCurrentHitPoints() + " HP left");
         updateTargetList();
+
+    }
+
+    public int getHIT_POINTS_LIMIT() {
+        return HIT_POINTS_LIMIT;
     }
 
     public enum BaseCharacterState {

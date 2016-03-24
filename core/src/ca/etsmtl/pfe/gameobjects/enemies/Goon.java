@@ -122,10 +122,22 @@ public class Goon extends BaseCharacter{
     public void attack(BaseCharacter target) {
         this.itemCharacter.attack(target);
         super.attack(target);
+        gameWorld.gameLog.addMessage("Goon hits you for 1" );
+        if(target.getCurrentHitPoints() > 0){
+
+            gameWorld.gameLog.addMessage("you can take " + (target.getHIT_POINTS_LIMIT() - target.getCurrentHitPoints()) + " more hits");
+        }
+    }
+
+    @Override
+    public void useOverwatch(){
+        super.useOverwatch();
+        this.gameWorld.gameLog.addMessage("Goon has used overwatch");
     }
 
 
-// AI States, adapted from the exemples on this page https://github.com/libgdx/gdx-ai/wiki/State-Machine
+
+    // AI States, adapted from the exemples on this page https://github.com/libgdx/gdx-ai/wiki/State-Machine
     public enum GoonState implements State<Goon> {
 
         CALM() {
