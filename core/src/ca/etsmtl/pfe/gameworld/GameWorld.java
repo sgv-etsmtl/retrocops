@@ -26,7 +26,7 @@ public class GameWorld {
     private int selectedCharacterIndex;
     public final int DEFAULT_TILE_SIZE = 160;
     public boolean turnNeedsInit = true;
-    private int nbOfDonePlayers, nbOfDoneEnemies, nbPlayerMoving;
+    private int nbOfDonePlayers, nbOfDoneEnemies;
     private GameScreen gameScreen;
     public GameLog gameLog;
     private final int HUMAN_MAX_MOVEMENT_IN_TILES = 12;
@@ -103,7 +103,6 @@ public class GameWorld {
                 turnNeedsInit = true;
             }
         }
-        this.gameRenderer.setGameLogMessages(this.gameLog.getMessages());
         postUpdateChecks();
 
     }
