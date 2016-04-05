@@ -1,6 +1,7 @@
 package ca.etsmtl.pfe.helper;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -30,6 +31,8 @@ public class AssetLoader {
     public static Image pistolDown;
     public static ArrayList<Sound> gunSounds;
     public static int NB_GUN_SOUNDS = 4;
+    public static Music gameMusic;
+
 
     public static void load() {
         textureAtlasButton = new TextureAtlas(Gdx.files.internal("ui/button.pack"));
@@ -49,6 +52,7 @@ public class AssetLoader {
         gunSounds.add(Gdx.audio.newSound(Gdx.files.internal("audio/sfx/pistol/pistol2.ogg")));
         gunSounds.add(Gdx.audio.newSound(Gdx.files.internal("audio/sfx/pistol/pistol3.ogg")));
         gunSounds.add(Gdx.audio.newSound(Gdx.files.internal("audio/sfx/pistol/pistol4.ogg")));
+        gameMusic = Gdx.audio.newMusic(Gdx.files.internal("audio/music_game.mp3"));
     }
 
     public static Sound getGunSoundRandom(){

@@ -217,7 +217,7 @@ public class GameWorld {
                     gameMap.unblockCell(startNode.getTilePixelX(), startNode.getTilePixelY());
                     gameMap.blockCell(endNode.getTilePixelX(), endNode.getTilePixelY());
                     selectedCharacter.setPathToWalk(path);
-                    selectedCharacter.unHighlightCharacter();
+                    //selectedCharacter.unHighlightCharacter();
                 }
                 setGameWorldState(GameWorldState.movingPlayer);
             }
