@@ -45,7 +45,7 @@ public class Goon extends BaseCharacter{
     public void update(float delta) {
 
         if(!this.isDone) {
-            if (this.getCurrentActionPoints() >= 0) {
+            if (this.getCurrentActionPoints() > 0) {
                 super.update(delta);
                 stateMachine.update();
             }
@@ -78,6 +78,11 @@ public class Goon extends BaseCharacter{
         }
     }
 
+    @Override
+    public void updateMovementPossibilities() {
+
+    }
+
     private void updateState() {
 
         updateTargetList();
@@ -94,9 +99,9 @@ public class Goon extends BaseCharacter{
 
 
     public void patrol() {
-        if(this.baseCharacterState == BaseCharacterState.waiting) {
+        if(this.baseCharacterState == BaseCharacterState.waiting && this.currentActionPoints > 0) {
 
-            int nbOfNeighbours = 0;
+            int nbOfNeighbours;
             Node currentNode = gameWorld.getGameMap().getMapGraph().getNodeByTileXY(this.getPosition().x / gameWorld.DEFAULT_TILE_SIZE,
                     this.getPosition().y / gameWorld.DEFAULT_TILE_SIZE,
                     this.gameWorld.getGameMap().getNumberOfTileWidth());

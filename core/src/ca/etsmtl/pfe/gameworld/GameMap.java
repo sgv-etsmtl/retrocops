@@ -165,4 +165,8 @@ public class GameMap {
         mapGraph.unblockCell(tileX, tileY, numberOfTileWidth);
     }
 
+    public void highlightCell(float tilePixelX, float tilePixelY){
+
+    }
+
 }

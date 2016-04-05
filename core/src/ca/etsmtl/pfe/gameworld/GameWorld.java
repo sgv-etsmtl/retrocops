@@ -206,9 +206,11 @@ public class GameWorld {
     private void changeCharacterPosition(float screenX, float screenY){
         if(!isPositionPixelInMenu(screenX,screenY) && selectedCharacter != null &&
                 selectedCharacter.getBaseCharacterState() == BaseCharacter.BaseCharacterState.waiting) {
+
             Vector3 end = getWorldPositionFromScreenPosition(screenX, screenY);
             Vector2 start = selectedCharacter.getPosition();
             DefaultGraphPath<Node> path = gameMap.getPath(start.x, start.y, end.x, end.y);
+
             if(path != null && path.nodes.size > 0 && path.nodes.size <= HUMAN_MAX_MOVEMENT_IN_TILES){
                 Node startNode = path.get(0);
                 Node endNode = path.get(path.nodes.size - 1);
@@ -216,6 +218,7 @@ public class GameWorld {
                     gameMap.unblockCell(startNode.getTilePixelX(), startNode.getTilePixelY());
                     gameMap.blockCell(endNode.getTilePixelX(), endNode.getTilePixelY());
                     selectedCharacter.setPathToWalk(path);
+                    selectedCharacter.unHighlightCharacter();
                 }
                 setGameWorldState(GameWorldState.movingPlayer);
             }
@@ -235,6 +238,7 @@ public class GameWorld {
                 if(ennemyTileX == tileXClick && ennemyTileY == tileYClick){
                     selectedCharacter.attack(ennemy);
                     if(!ennemy.isAlive()){
+                        gameMap.unblockCell(ennemy.getPosition().x, ennemy.getPosition().y);
                         ennemies.remove(ennemy);
                         gameRenderer.removeCharacterToDraw(ennemy);
                     }
@@ -247,14 +251,14 @@ public class GameWorld {
         }
     }
 
-    public void changeCharacterTilePosition(Node fromNode, Node toNode, BaseCharacter baseCharacter){
+    public void
+    changeCharacterTilePosition(Node fromNode, Node toNode, BaseCharacter baseCharacter){
 
             DefaultGraphPath<Node> path = gameMap.getPathFromNodes(fromNode, toNode);
             if(path != null && path.nodes.size > 0){
-                Node startNode = path.get(0);
-                Node endNode = path.get(path.nodes.size - 1);
-                gameMap.unblockCell(startNode.getTilePixelX(), startNode.getTilePixelY());
-                gameMap.blockCell(endNode.getTilePixelX(), endNode.getTilePixelY());
+
+                gameMap.unblockCell(fromNode.getTilePixelX(), fromNode.getTilePixelY());
+                gameMap.blockCell(toNode.getTilePixelX(), toNode.getTilePixelY());
                 baseCharacter.setPathToWalk(path);
             }
     }

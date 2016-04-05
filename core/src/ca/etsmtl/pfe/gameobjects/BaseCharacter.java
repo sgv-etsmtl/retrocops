@@ -55,11 +55,14 @@ public abstract class BaseCharacter {
     protected BaseCharacterState baseCharacterState;
     
     protected boolean isHighlight;
+    protected boolean isShowingMoveHighlights;
+    protected ArrayList<DefaultGraphPath<Node>> movementPossibilities;
 
     protected boolean isHighlightForAttack;
 
     protected Color colorOfHighlightForSelected;
     protected Color colorOfHighlightForAttack;
+    protected Color colorOfHighlightForMovement;
 
     protected List<BaseCharacter> targetList;
 
@@ -85,8 +88,10 @@ public abstract class BaseCharacter {
         itemCharacter = new Pistol(50,10,20);
         itemCharacter.setOwner(this);
         colorOfHighlightForSelected = new Color(0,1,0,0.5f);
+        colorOfHighlightForMovement = new Color(0,1,1,0.4f);
         colorOfHighlightForAttack = new Color(1,0,0,0.5f);
         targetList = new ArrayList<BaseCharacter>();
+        movementPossibilities = new ArrayList<DefaultGraphPath<Node>>();
     }
 
     public Vector2 getPosition() {
@@ -177,6 +182,24 @@ public abstract class BaseCharacter {
             if(isHighlightForAttack){
                 shapeRenderer.setColor(colorOfHighlightForAttack);
             }
+
+            else {
+                shapeRenderer.setColor(colorOfHighlightForSelected);
+                if(isShowingMoveHighlights) {
+
+                }
+            }
+            shapeRenderer.setColor(currentColor);
+            shapeRenderer.rect(position.x, position.y, spriteCharacter.getWidth(), spriteCharacter.getHeight());
+        }
+    }
+
+    public void drawValidTilesHighlights(ShapeRenderer shapeRenderer){
+        if(spriteCharacter != null && isAlive){
+            Color currentColor = shapeRenderer.getColor();
+            if(isHighlightForAttack){
+                shapeRenderer.setColor(colorOfHighlightForMovement);
+            }
             else {
                 shapeRenderer.setColor(colorOfHighlightForSelected);
             }
@@ -184,6 +207,8 @@ public abstract class BaseCharacter {
             shapeRenderer.rect(position.x, position.y, spriteCharacter.getWidth(), spriteCharacter.getHeight());
         }
     }
+
+
 
     public List<BaseCharacter> getTargetList() {
         return targetList;
@@ -221,6 +246,7 @@ public abstract class BaseCharacter {
                         baseCharacterState = BaseCharacterState.waiting;
                         this.currentActionPoints--;
                         updateTargetList();
+                        updateMovementPossibilities();
                         this.pathToWalk.clear();
                     }
                 }
@@ -237,6 +263,7 @@ public abstract class BaseCharacter {
     /* FIN DU CODE EMPRUNTÉ */
 
     public abstract void updateTargetList();
+    public abstract void updateMovementPossibilities();
 
     //Code emprunté et adapté de la 3eme fonction de cette page.
     // http://playtechs.blogspot.ca/2007/03/raytracing-on-grid.html
@@ -399,6 +426,7 @@ public abstract class BaseCharacter {
 
     public void highlightSelectedCharacter(){
         isHighlight = true;
+        isShowingMoveHighlights = true;
         isHighlightForAttack = false;
     }
 
@@ -409,6 +437,7 @@ public abstract class BaseCharacter {
 
     public void highlightCharacterForAttack(){
         isHighlight = true;
+        isShowingMoveHighlights = false;
         isHighlightForAttack = true;
     }
 
@@ -419,6 +448,7 @@ public abstract class BaseCharacter {
 
     public void unHighlightCharacter(){
         isHighlight = false;
+        isShowingMoveHighlights = false;
         isHighlightForAttack = false;
     }
 

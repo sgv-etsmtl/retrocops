@@ -1,14 +1,12 @@
 package ca.etsmtl.pfe.gameobjects;
 
-import com.badlogic.gdx.Gdx;
-
 import java.util.ArrayList;
 
 import ca.etsmtl.pfe.gameworld.GameWorld;
 
 public class PlayerCharacter extends BaseCharacter{
 
-    private final int AI_SIGHT_RANGE = 6;
+    private final int PLAYER_AIM_RANGE = 6;
     public PlayerCharacter(GameWorld gameWorld) {
         super(gameWorld);
     }
@@ -24,11 +22,12 @@ public class PlayerCharacter extends BaseCharacter{
         //    Gdx.app.log("info", "PC is at " + ennemy.getPosition());
 
 
-            if (this.getPosition().dst(ennemy.getPosition().x, ennemy.getPosition().y) < AI_SIGHT_RANGE * gameWorld.DEFAULT_TILE_SIZE
+            if (this.getPosition().dst(ennemy.getPosition().x, ennemy.getPosition().y) < PLAYER_AIM_RANGE * gameWorld.DEFAULT_TILE_SIZE
                     && this.canRaytrace(ennemy)) {
                 this.targetList.add(ennemy);
             }
         }
+
 
     }
 
@@ -50,4 +49,14 @@ public class PlayerCharacter extends BaseCharacter{
         super.useOverwatch();
         gameWorld.gameLog.addMessage("You used overwatch");
     }
+
+    @Override
+    public void updateMovementPossibilities(){
+        this.movementPossibilities.clear();
+
+
+        //DefaultGraphPath<Node> path = gameMap.getPath(start.x, start.y, end.x, end.y);
+
+    }
+
 }
