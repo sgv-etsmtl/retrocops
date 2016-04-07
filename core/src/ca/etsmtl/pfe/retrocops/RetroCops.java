@@ -45,11 +45,15 @@ public class RetroCops extends Game {
 	}
 
 	public void changeScreenToGameOverScreen() {
+		AssetLoader.gameMusic.setLooping(false);
+		AssetLoader.gameMusic.stop();
 		gameOverScreen.changeInputToGameOverScreen();
 		setScreen(gameOverScreen);
 	}
 
 	public void changeScreenToGameScreen(){
+		AssetLoader.gameMusic.play();
+		AssetLoader.gameMusic.setLooping(true);
 		gameScreen.changeInputToGameScreen();
 		setScreen(gameScreen);
 	}

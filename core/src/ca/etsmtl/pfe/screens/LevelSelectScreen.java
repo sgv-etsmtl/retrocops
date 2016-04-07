@@ -10,18 +10,10 @@ import ca.etsmtl.pfe.ui.levelselect.LevelSelectMenu;
 
 public class LevelSelectScreen implements Screen {
 
-    private Game currentGame;
-    private float width;
-    private float heigth;
-
     private LevelSelectMenu levelSelectMenu;
 
     public LevelSelectScreen(float width, float heigth, RetroCops currentGame) {
-        this.currentGame = currentGame;
-        this.width = width;
-        this.heigth = heigth;
         levelSelectMenu = new LevelSelectMenu(width, heigth, currentGame);
-
     }
 
     public void changeInputToLevelSelectScreen(){

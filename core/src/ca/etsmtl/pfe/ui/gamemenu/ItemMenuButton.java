@@ -24,12 +24,6 @@ public class ItemMenuButton extends Button {
     private boolean cliked;
     private boolean isPress;
 
-    private float offsetXTotalAmmoLabel;
-    private float offsetYTotalAmmoLabel;
-    private float offsetXcurrentAmmoInfoLabel;
-    private float offsetYcurrentAmmoInfoLabel;
-    private Cell<Stack> stackOfButton;
-
     public ItemMenuButton(String totalAmmo, String currentAmmoClip, String maxAmmoByClip,
                           ButtonStyle style, Image imageUp, Image imageDown) {
         super(style);
@@ -46,7 +40,7 @@ public class ItemMenuButton extends Button {
         this.currentImage = imageUp;
         cliked = false;
         isPress = false;
-        stackOfButton = this.stack(this.currentImage, this.totalAmmoLabel, this.currentAmmoInfoLabel);
+        this.stack(this.currentImage, this.totalAmmoLabel, this.currentAmmoInfoLabel);
     }
 
     public void updateInfoAmmo(int totalAmmo, int currentAmmoClip, int maxAmmoByClip){

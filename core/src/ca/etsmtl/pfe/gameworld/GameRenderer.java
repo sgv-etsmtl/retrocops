@@ -29,7 +29,6 @@ public class GameRenderer {
     private SpriteBatch batcher;
     private SpriteBatch characterBatcher;
     private Vector3 worldPosition;
-    private ArrayList<String> gameLogMessages;
 
     private float leftboundary;
     private float rigthboundary;
@@ -135,10 +134,6 @@ public class GameRenderer {
         writeFont.draw(batcher, "pos cam " + cam.position.x + ", " + cam.position.y, 1200, 250);
         writeFont.draw(batcher, "world click " + worldPosition.x + ", " + worldPosition.y, 1200, 400);
         batcher.end();
-    }
-
-    public void setGameLogMessages(ArrayList<String> messages){
-        this.gameLogMessages = messages;
     }
 
     private void drawCharacter(boolean drawDebug){
