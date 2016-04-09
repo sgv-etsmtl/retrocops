@@ -14,7 +14,7 @@ import com.badlogic.gdx.utils.Array;
    Les lignes suivantes sont basées sur une classe
    provenant du site :
       http://nexsoftware.net/wp/2013/05/09/libgdx-making-a-paged-level-selection-screen/
-   J'ai la classe sert à représenter tout les pages, de les afficher et de permettre le déplacement
+   J'ai la classe servent à représenter tout les pages, de les afficher et de permettre le déplacement
    entre les pages
 */
 public class PagedScrollPane extends ScrollPane {

@@ -15,6 +15,16 @@ import ca.etsmtl.pfe.helper.AssetLoader;
 import ca.etsmtl.pfe.helper.LevelLoader;
 import ca.etsmtl.pfe.retrocops.RetroCops;
 
+/*
+   CODE EMPRUNTÉ :
+   Les lignes suivantes sont basées sur une classe
+   provenant du site :
+      http://nexsoftware.net/wp/2013/05/09/libgdx-making-a-paged-level-selection-screen/
+   J'ai prit classe PagedScrollPaneTest. Cette classe contient le stage qui affiche la tables
+   des différent niveau. J'ai changé la methode pour ajouter les niveau à la table pour utiliser
+   les information du JSON contenant tout les niveau du jeu et ainsi afficher tout les niveau
+   du JSON dans le selecteur de niveau.
+*/
 
 public class LevelSelectMenu {
 
@@ -82,8 +92,6 @@ public class LevelSelectMenu {
         LevelSelectButton button = new LevelSelectButton(label, new Image(new Texture(levelImagePath)),
                                                          buttonLevelSelectStyle);
         button.setSize(200,200);
-        //for star support
-        //http://nexsoftware.net/wp/2013/05/09/libgdx-making-a-paged-level-selection-screen/
         button.setName(Integer.toString(levelIndex));
         button.addListener(levelClickListener);
         return button;
@@ -95,3 +103,4 @@ public class LevelSelectMenu {
     }
 
 }
+/* FIN DU CODE EMPRUNTÉ */
